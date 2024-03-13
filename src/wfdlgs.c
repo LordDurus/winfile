@@ -14,6 +14,7 @@
 #include <dlgs.h>
 #include "lfn.h"
 #include "wfcopy.h"
+#include "resize.h"
 
 VOID  MDIClientSizeChange(HWND hwndActive, INT iFlags);
 
@@ -138,10 +139,10 @@ DO_AGAIN:
 
 INT_PTR
 CALLBACK
-OtherDlgProc(register HWND hDlg, UINT wMsg, WPARAM wParam, LPARAM lParam)
+OtherDlgProc(HWND hDlg, UINT wMsg, WPARAM wParam, LPARAM lParam)
 {
   DWORD          dwView;
-  register HWND hwndActive;
+  HWND           hwndActive;
 
   UNREFERENCED_PARAMETER(lParam);
 
@@ -334,7 +335,6 @@ DoHelp:
   return TRUE;
 }
 
-
 INT_PTR
 CALLBACK
 SelectDlgProc(HWND hDlg, UINT wMsg, WPARAM wParam, LPARAM lParam)
@@ -343,6 +343,10 @@ SelectDlgProc(HWND hDlg, UINT wMsg, WPARAM wParam, LPARAM lParam)
         TCHAR szList[128];
         TCHAR szSpec[MAXFILENAMELEN];
         LPTSTR p;
+
+        if (ResizeDialogProc(hDlg, wMsg, wParam, lParam)) {
+            return TRUE;
+        }
 
         UNREFERENCED_PARAMETER(lParam);
 
@@ -808,8 +812,8 @@ DoHelp:
 VOID
 KillQuoteTrailSpace( LPTSTR szFile )
 {
-   register LPTSTR pc;
-   register LPTSTR pcNext;
+   LPTSTR pc;
+   LPTSTR pcNext;
    LPTSTR pcLastSpace = NULL;
 
    // Could reuse szFile, but that's ok,
@@ -846,59 +850,63 @@ KillQuoteTrailSpace( LPTSTR szFile )
 VOID
 ActivateCommonContextMenu(HWND hwnd, HWND hwndLB, LPARAM lParam)
 {
-	DWORD cmd, item;
-	POINT pt;
+   DWORD cmd, item;
+   POINT pt;
 
-	HMENU hMenu = GetSubMenu(LoadMenu(hAppInstance, TEXT("CTXMENU")), 0);
+   HMENU hMenu = GetSubMenu(LoadMenu(hAppInstance, TEXT("CTXMENU")), 0);
 
-	if (lParam == -1)
-	{
-		RECT rect;
+   if (lParam == -1)
+   {
+      RECT rect;
 
-		item = (DWORD)SendMessage(hwndLB, LB_GETCURSEL, 0, 0);
-		SendMessage(hwndLB, LB_GETITEMRECT, (WPARAM)LOWORD(item), (LPARAM)&rect);
-		pt.x = rect.left;
-		pt.y = rect.bottom;
-		ClientToScreen(hwnd, &pt);
-		lParam = POINTTOPOINTS(pt);
-	}
-	else
-	{
-		POINTSTOPOINT(pt, lParam);
+      item = (DWORD)SendMessage(hwndLB, LB_GETCURSEL, 0, 0);
+      SendMessage(hwndLB, LB_GETITEMRECT, (WPARAM)LOWORD(item), (LPARAM)&rect);
+      pt.x = rect.left;
+      pt.y = rect.bottom;
+      ClientToScreen(hwnd, &pt);
+      lParam = POINTTOPOINTS(pt);
+   }
+   else
+   {
+      POINTSTOPOINT(pt, lParam);
 
-		ScreenToClient(hwndLB, &pt);
-		item = (DWORD)SendMessage(hwndLB, LB_ITEMFROMPOINT, 0, POINTTOPOINTS(pt));
+      ScreenToClient(hwndLB, &pt);
+      item = (DWORD)SendMessage(hwndLB, LB_ITEMFROMPOINT, 0, POINTTOPOINTS(pt));
 
-		if (HIWORD(item) == 0)
-		{
-			HWND hwndTree, hwndParent;
+      if (HIWORD(item) == 0)
+      {
+         HWND hwndTree, hwndParent;
 
-			SetFocus(hwnd);
+         SetFocus(hwnd);
 
-			hwndParent = GetParent(hwnd);
-			hwndTree = HasTreeWindow(hwndParent);
+         hwndParent = GetParent(hwnd);
+         hwndTree = HasTreeWindow(hwndParent);
 
-			// if hwnd is the tree control within the parent window
-			if (hwndTree == hwnd) {
-				// tree control; do selection differently
-				SendMessage(hwndLB, LB_SETCURSEL, (WPARAM)item, 0L);
-				SendMessage(hwnd, WM_COMMAND, GET_WM_COMMAND_MPS(0, hwndLB, LBN_SELCHANGE));
-			}
-			else {
-				SendMessage(hwndLB, LB_SETSEL, (WPARAM)FALSE, (LPARAM)-1);
-				SendMessage(hwndLB, LB_SETSEL, (WPARAM)TRUE, (LPARAM)item);
+         // if hwnd is the tree control within the parent window
+         if (hwndTree == hwnd) {
+            // tree control; do selection differently
+            SendMessage(hwndLB, LB_SETCURSEL, (WPARAM)item, 0L);
+            SendMessage(hwnd, WM_COMMAND, GET_WM_COMMAND_MPS(0, hwndLB, LBN_SELCHANGE));
+         }
+         else
+         {
+            SendMessage(hwndLB, LB_SETSEL, (WPARAM)FALSE, (LPARAM)-1);
+            SendMessage(hwndLB, LB_SETSEL, (WPARAM)TRUE, (LPARAM)item);
 
-                BOOL bDir = FALSE;
-                SendMessage(hwnd, FS_GETSELECTION, 5, (LPARAM)&bDir);
-                if (bDir)
-                    EnableMenuItem(hMenu, IDM_EDIT, MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
+            BOOL bDir = FALSE;
+            SendMessage(hwnd, FS_GETSELECTION, 5, (LPARAM)&bDir);
+            if (bDir)
+            {
+               EnableMenuItem(hMenu, IDM_EDIT, MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
             }
-		}
-	}
+         }
+      }
+   }
 
-	cmd = TrackPopupMenu(hMenu, TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_RETURNCMD, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), 0, hwnd, NULL);
-	if (cmd != 0)
-		PostMessage(hwndFrame, WM_COMMAND, GET_WM_COMMAND_MPS(cmd, 0, 0));
+   cmd = TrackPopupMenu(hMenu, TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_RETURNCMD, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), 0, hwnd, NULL);
+   if (cmd != 0) {
+      PostMessage(hwndFrame, WM_COMMAND, GET_WM_COMMAND_MPS(cmd, 0, 0));
+   }
 
-	DestroyMenu(hMenu);
+   DestroyMenu(hMenu);
 }

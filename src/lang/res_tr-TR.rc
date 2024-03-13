@@ -9,7 +9,7 @@
 
 LANGUAGE LANG_TURKISH, SUBLANG_TURKISH_TURKEY
 
-FRAMEMENU MENU PRELOAD
+FRAMEMENU MENU
 BEGIN
     POPUP       "&Dosya"
     BEGIN
@@ -36,9 +36,13 @@ BEGIN
         MENUITEM    "Dizi&n Oluştur...\tCtrl+Shift+N", IDM_MAKEDIR
         MENUITEM    "A&ra...\tCtrl+F",              IDM_SEARCH
         MENUITEM    "Dosyaları Se&ç...",            IDM_SELECT
-        MENUITEM    "Bash Kabuğu &Başlat...\tCtrl+B",  IDM_STARTBASHSHELL
-        MENUITEM    "Cmd Kabuğu Ba&şlat...\tCtrl+K",   IDM_STARTCMDSHELL
-        MENUITEM    "Po&wershell'i Başlat...\tCtrl+P", IDM_STARTPOWERSHELL
+        POPUP       "Başlat (&.)"
+        BEGIN
+            MENUITEM    "&Bash Kabuğu Başlat...\tCtrl+B", IDM_STARTBASHSHELL
+            MENUITEM    "&Cmd Kabuğu Başlat...\tCtrl+K", IDM_STARTCMDSHELL
+            MENUITEM    "&Powershell'i Başlat...\tCtrl+P", IDM_STARTPOWERSHELL
+            MENUITEM    "&Explorer'i Başlat...\tCtrl+E", IDM_STARTEXPLORER
+        END
         MENUITEM    "Dizine &Git...",               IDM_GOTODIR
         MENUITEM    SEPARATOR
         MENUITEM    "Çı&kış",                       IDM_EXIT
@@ -86,7 +90,7 @@ BEGIN
         MENUITEM    "&Onay...",                     IDM_CONFIRM
         MENUITEM    "&Yazıtipi...",                 IDM_FONT
         MENUITEM    "A&raç Çubuğunu Özelleştir...", IDM_TOOLBARCUST
-        MENUITEM    "&Ek Tercihler",                IDM_PREF
+        MENUITEM    "&Ek Tercihler...",             IDM_PREF
         MENUITEM    SEPARATOR
         MENUITEM    "&Araç Çubuğu",                 IDM_TOOLBAR
         MENUITEM    "&Sürücü Çubuğu",               IDM_DRIVEBAR
@@ -126,7 +130,7 @@ BEGIN
 
 END
 
-CTXMENU MENU PRELOAD
+CTXMENU MENU
 BEGIN
     POPUP "Dummy Popup"
     BEGIN
@@ -136,17 +140,18 @@ BEGIN
     MENUITEM    "&Taşı...\tF7",                     IDM_MOVE
     MENUITEM    "K&opyala...\tF8",                  IDM_COPY
     MENUITEM    "S&embolik bağlantı...\tF11",       IDM_SYMLINK
-    MENUITEM    "Sabi&t bağlantı...\tShift+F11",  IDM_HARDLINK
+    MENUITEM    "Sabi&t bağlantı...\tShift+F11",    IDM_HARDLINK
     MENUITEM    "&Pano'ya Kopyala\tCtrl+C",         IDM_COPYTOCLIPBOARD
     MENUITEM    "Pa&no'ya Kes\tCtrl+X",             IDM_CUTTOCLIPBOARD
     MENUITEM    "Yapıştı&r\tCtrl+V",                IDM_PASTE
-    MENUITEM    "&Sil...tDel",                      IDM_DELETE
+    MENUITEM    "&Sil...\tDel",                     IDM_DELETE
     MENUITEM    "Ad Değ&iştir...\tF2",              IDM_RENAME
     MENUITEM    "Ö&zellikler...\tAlt+Enter",        IDM_ATTRIBS
     MENUITEM    "Ça&lıştır...",                     IDM_RUN
     MENUITEM    "Bash Kabuğu Başlat...",            IDM_STARTBASHSHELL
     MENUITEM    "Cmd Kabuğu Başlat...",             IDM_STARTCMDSHELL
-    MENUITEM    "PowerShell Başlat...",             IDM_STARTPOWERSHELL
+    MENUITEM    "Po&werShell Başlat...",            IDM_STARTPOWERSHELL
+    MENUITEM    "E&xplorer Başlat...",              IDM_STARTEXPLORER
     MENUITEM    "Dizine &Git...",                   IDM_GOTODIR
     END
 END
@@ -154,7 +159,7 @@ END
 
 #define SUGGEST(id,err,flags,str) id+IDS_SUGGESTBEGIN str
 /*              0....5....1....56...2....5....3.2..5....4....5....5....6....5....7....5....8....5....9....5....0....5....1....5....2....5..8 */
-STRINGTABLE DISCARDABLE PRELOAD
+STRINGTABLE
 BEGIN
    // IDS_ENDSESSION           "Windows'tan Çık"
    // IDS_ENDSESSIONMSG        "Bu işlem, Windows oturumunu kapatacaktır."
@@ -245,6 +250,7 @@ BEGIN
    IDS_PRINTONLYONE         "Birden fazla dosya yazdırılamıyor.\n\nTek bir dosya seçip yeniden deneyin."
 
    IDS_CURDIRIS,            "Geçerli Dizin: %s"
+   IDS_CURDIRSARE,          "Other: "
    IDS_COPY,                "Kopyala"
    IDS_RENAME,              "Ad Değiştir"
    IDS_FORMAT,              "Disk Biçimlendir"
@@ -281,25 +287,29 @@ BEGIN
    IDS_COPYERROR + FUNC_SETDRIVE    "Sürücü Seçmede Hata"
    IDS_COPYERROR + FUNC_EXPAND      "Dizin Okumada Hata"
    IDS_COPYERROR + FUNC_LABEL       "Disk Etiketlemede Hata"
+   IDS_COPYERROR + FUNC_LINK        "Sembolik Bağlantı Oluşturmada Hata"
+   IDS_COPYERROR + FUNC_HARD        "Sabit Bağlantı Oluşturmada Hata"
+   IDS_COPYERROR + FUNC_JUNC        "Birleşme Noktası Oluşturmada Hata"
    IDS_VERBS + FUNC_COPY    "Dosya Yöneticisi %s öğesini kopyalayamıyor: %s"
    IDS_VERBS + FUNC_MOVE    "Dosya Yöneticisi %s öğesini taşıyamıyor: %s"
    IDS_VERBS + FUNC_DELETE  "Dosya Yöneticisi %s öğesini silemiyor: %s"
    IDS_VERBS + FUNC_RENAME  "Dosya Yöneticisi %s öğesinin adını değiştiremiyor: %s"
+   IDS_VERBS + FUNC_LINK    "Dosya Yöneticisi %s sembolik bağlantısını oluşturamıyor: %s"
+   IDS_VERBS + FUNC_HARD    "Dosya Yöneticisi %s sabit bağlantısını oluşturamıyor: %s"
+   IDS_VERBS + FUNC_JUNC    "Dosya Yöneticisi %s birleşme noktasını oluşturamıyor: %s"
    IDS_ACTIONS + 1          "Dosya Yöneticisi %s dizinini oluşturamıyor: %s"
    IDS_ACTIONS + 2          "Dosya Yöneticisi %s dizinini kaldıramıyor: %s"
    IDS_REPLACING            "Dosya Yöneticisi %s öğesini oluşturamıyor veya değiştiremiyor: %s"
    // IDS_CREATING              "Dosya Yöneticisi %s öğesini oluşturamıyor: %s"
 
-JAPANBEGIN
-    IDS_KK_COPYFROMSTR,     "コピー元(&F):"
-    IDS_KK_COPYTOSTR,       "コピー先(&T):"
-    IDS_KK_RENAMEFROMSTR,   "元の名前(&F):"
-    IDS_KK_RENAMETOSTR,     "新しい名前(&T):"
-    IDS_KK_HARDLINKFROMSTR, "ハードリンク元(&F):"
-    IDS_KK_HARDLINKTOSTR,   "ハードリンク先(&T):"
-    IDS_KK_SYMLINKFROMSTR,  "シンボリックリンク元(&F):"
-    IDS_KK_SYMLINKTOSTR,    "シンボリックリンク先(&T):"
-  JAPANEND
+    IDS_KK_COPYFROMSTR,     "Şu&radan:"
+    IDS_KK_COPYTOSTR,       "Ş&uraya:"
+    IDS_KK_RENAMEFROMSTR,   "Şu&radan:"
+    IDS_KK_RENAMETOSTR,     "Ş&uraya:"
+    IDS_KK_HARDLINKFROMSTR, "Şu&radan:"
+    IDS_KK_HARDLINKTOSTR,   "Ş&uraya:"
+    IDS_KK_SYMLINKFROMSTR,  "Şu&radan:"
+    IDS_KK_SYMLINKTOSTR,    "Ş&uraya:"
 
 // include reason strings
 #include "suggest_tr-TR.db"
@@ -308,15 +318,10 @@ JAPANBEGIN
     IDS_WRITEPROTECTFILE        "Bu; gizli, saltokunur veya bir sistem dosyası."
     IDS_COPYINGTITLE            "Kopyalanıyor..."
 
-JAPANBEGIN
-    IDS_KK_COPY                 "コピー先:"
-JAPANEND
-
     IDS_QUICKFORMATTINGTITLE    "Hızlı biçimlendiriliyor..."
     IDS_BUSYFORMATQUITVERIFY    "Dosya Yöneticisi şu anda bir diski biçimlendiriyor. Dosya Yöneticisi'nden çıkmak bu işlemi iptal edecektir."
     IDS_BUSYCOPYQUITVERIFY      "Dosya Yöneticisi şu anda bir diski kopyalıyor. Dosya Yöneticisi'nden çıkmak bu işlemi iptal edecektir."
     IDS_PERCENTCOMPLETE         "Tamamlanan Yüzde"
-    IDS_FORMATSELECTDLGTITLE    "Diski Biçimlendir"
     IDS_12MB                    "1%s2 MB"
     IDS_360KB                   "360K"
     IDS_144MB                   "1%s44 MB"
@@ -473,7 +478,7 @@ END
 
 /* Help strings for the popup menus.
  */
-STRINGTABLE LOADONCALL MOVEABLE DISCARDABLE
+STRINGTABLE
 BEGIN
     MH_POPUP+IDM_FILE,          "Dosyalarla çalışmak için komutlar"
     MH_POPUP+IDM_DISK,          "Disklerle çalışmak için komutlar"
@@ -488,15 +493,15 @@ END
 
 // Help strings for the "standard" toolbar items.
 
-STRINGTABLE LOADONCALL MOVEABLE DISCARDABLE
+STRINGTABLE
 BEGIN
     MH_MYITEMS+IDM_OPEN,        "Seçili öğeyi açar"
     MH_MYITEMS+IDM_EDIT,        "Seçili öğeyi notepad.exe kullanarak düzenler"
     MH_MYITEMS+IDM_MOVE,        "Seçili öğeyi taşır"
     MH_MYITEMS+IDM_COPY,        "Dosyaları ve dizinleri kopyalar"
     MH_MYITEMS+IDM_COPYTOCLIPBOARD, "Bir veya birden çok dosyayı panoya kopyalar"
-	MH_MYITEMS+IDM_CUTTOCLIPBOARD, "Bir veya birden çok dosyayı panoya keser"
-    MH_MYITEMS+IDM_PASTE,		"Panodan dosyayı geçerli dizine yapıştırır"
+    MH_MYITEMS+IDM_CUTTOCLIPBOARD, "Bir veya birden çok dosyayı panoya keser"
+    MH_MYITEMS+IDM_PASTE,       "Panodan dosyayı geçerli dizine yapıştırır"
     MH_MYITEMS+IDM_COMPRESS,    "Bir dosyayı veya dizini sıkıştırır"
     MH_MYITEMS+IDM_UNCOMPRESS,  "Bir dosyanın veya dizinin sıkıştırmasını açar"
     MH_MYITEMS+IDM_DELETE,      "Dosyalar ve dizinler siler"
@@ -570,7 +575,7 @@ END
 
 // Strings for menu items that may be added at init time.
 
-STRINGTABLE MOVEABLE DISCARDABLE
+STRINGTABLE
 BEGIN
     IDS_CONNECT,                "&Ağ Sürücüsü Bağla..."
     IDS_DISCONNECT,             "Ağ &Sürücüsü Bağlantısı Kes..."

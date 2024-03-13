@@ -17,6 +17,7 @@ extern "C"
 #include "winfile.h"
 #include "treectl.h"
 #include "lfn.h"
+#include "resize.h"
 }
 
 void BuildDirectoryBagOValues(BagOValues<PDNODE> *pbov, LPTSTR szRoot, PDNODE pNode, DWORD scanEpoc, LPTSTR szCachedRootLower);
@@ -518,28 +519,44 @@ VOID UpdateGotoList(HWND hDlg)
 	vector<PDNODE> options = GetDirectoryOptionsFromText(szText, &bLimited);
 
 	HWND hwndLB = GetDlgItem(hDlg, IDD_GOTOLIST);
+
+	// Since we're probably about to add a lot of items, suppress redraw
+	// and do it once at the end
+	SendMessage(hwndLB, WM_SETREDRAW, FALSE, 0);
 	SendMessage(hwndLB, LB_RESETCONTENT, 0, 0);
 
-	if (options.empty())
-		return;
-
-	for (auto i = 0u; i < 10u && i < options.size(); i++)
+	if (!options.empty())
 	{
-		GetTreePath(options.at(i), szText);
+		const size_t resultCount = min((size_t)1000, options.size());
 
-		SendMessage(hwndLB, LB_ADDSTRING, 0, (LPARAM)szText);
+		// Try to allocate enough space in the list to avoid repeated
+		// allocations.  This is an optimization and doesn't need to be
+		// perfect, although being slightly too large is probably better
+		// than slightly too small.  Since building the paths for this
+		// seems needlessly expensive, assume each entry will be MAX_PATH.
+		SendMessage(hwndLB, LB_INITSTORAGE, resultCount, resultCount * MAX_PATH);
+		for (size_t i = 0; i < resultCount; ++i)
+		{
+			GetTreePath(options.at(i), szText);
+
+			SendMessage(hwndLB, LB_ADDSTRING, 0, (LPARAM)szText);
+		}
+
+		if (bLimited)
+		{
+			SendMessage(hwndLB, LB_ADDSTRING, 0, (LPARAM)TEXT("... limited ..."));
+		}
+		else if (options.size() > resultCount)
+		{
+			SendMessage(hwndLB, LB_ADDSTRING, 0, (LPARAM)TEXT("... more ..."));
+		}
+
+		SendMessage(hwndLB, LB_SETCURSEL, 0, 0);
 	}
 
-	if (bLimited)
-	{
-		SendMessage(hwndLB, LB_ADDSTRING, 0, (LPARAM)TEXT("... limited ..."));
-	}
-	else if (options.size() >= 10)
-	{
-		SendMessage(hwndLB, LB_ADDSTRING, 0, (LPARAM)TEXT("... more ..."));
-	}
-
-	SendMessage(hwndLB, LB_SETCURSEL, 0, 0);
+	// Perform the redraw
+	SendMessage(hwndLB, WM_SETREDRAW, TRUE, 0);
+	RedrawWindow(hwndLB, NULL, NULL, RDW_ERASE | RDW_FRAME | RDW_INVALIDATE | RDW_ALLCHILDREN);
 }
 
 /*--------------------------------------------------------------------------*/
@@ -563,27 +580,16 @@ LRESULT APIENTRY GotoEditSubclassProc(
 		if (lParam) {
 			LPMSG lpmsg = (LPMSG)lParam;
 
-			if (lpmsg->message == WM_KEYDOWN && (lpmsg->wParam == VK_DOWN || lpmsg->wParam == VK_UP || lpmsg->wParam == VK_HOME || lpmsg->wParam == VK_END)) {
+			if ((lpmsg->message == WM_KEYDOWN || lpmsg->message == WM_KEYUP) && 
+				(lpmsg->wParam == VK_DOWN ||
+				 lpmsg->wParam == VK_UP ||
+				 lpmsg->wParam == VK_HOME ||
+				 lpmsg->wParam == VK_END ||
+				 lpmsg->wParam == VK_PRIOR ||
+				 lpmsg->wParam == VK_NEXT)) {
+
 				HWND hwndDlg = GetParent(hwnd);
-				DWORD iSel = (DWORD)SendDlgItemMessage(hwndDlg, IDD_GOTOLIST, LB_GETCURSEL, 0, 0);
-				if (iSel == LB_ERR)
-					iSel = 0;
-				else if (lpmsg->wParam == VK_DOWN)
-					iSel++;
-				else if (lpmsg->wParam == VK_UP)
-					iSel--;
-				else if (lpmsg->wParam == VK_HOME)
-					iSel = 0;
-				else if (lpmsg->wParam == VK_END)
-				{
-					iSel = (DWORD)SendDlgItemMessage(hwndDlg, IDD_GOTOLIST, LB_GETCOUNT, 0, 0) - 1;
-				}
-				if (SendDlgItemMessage(hwndDlg, IDD_GOTOLIST, LB_SETCURSEL, iSel, 0) == LB_ERR) {
-					if (lpmsg->wParam == VK_DOWN)
-						SendDlgItemMessage(hwndDlg, IDD_GOTOLIST, LB_SETCURSEL, 0, 0);
-					else if (lpmsg->wParam == VK_UP)
-						SendDlgItemMessage(hwndDlg, IDD_GOTOLIST, LB_SETCURSEL, SendDlgItemMessage(hwndDlg, IDD_GOTOLIST, LB_GETCOUNT, 0, 0) - 1, 0);
-				}
+				SendDlgItemMessage(hwndDlg, IDD_GOTOLIST, lpmsg->message, lpmsg->wParam, lpmsg->lParam);
 				return DLGC_WANTALLKEYS;
 			}
 		}
@@ -612,6 +618,10 @@ GotoDirDlgProc(HWND hDlg, UINT wMsg, WPARAM wParam, LPARAM lParam)
 {
 	HWND hwndEdit;
 	DWORD command_id;
+
+	if (ResizeDialogProc(hDlg, wMsg, wParam, lParam)) {
+		return TRUE;
+	}
 
 	switch (wMsg)
 	{

@@ -14,6 +14,7 @@
 #include "wfcopy.h"
 #include "wnetcaps.h"         // WNetGetCaps()
 #include "commdlg.h"
+#include "resize.h"
 
 
 
@@ -95,7 +96,6 @@ StarFilename(LPTSTR pszPath)
    }
 }
 
-
 /*--------------------------------------------------------------------------*/
 /*                                                                          */
 /*  SearchDlgProc() -                                                       */
@@ -104,13 +104,15 @@ StarFilename(LPTSTR pszPath)
 
 INT_PTR
 CALLBACK
-SearchDlgProc(register HWND hDlg, UINT wMsg, WPARAM wParam, LPARAM lParam)
+SearchDlgProc(HWND hDlg, UINT wMsg, WPARAM wParam, LPARAM lParam)
 {
    LPTSTR     p;
    MDICREATESTRUCT   MDICS;
    TCHAR szStart[MAXFILENAMELEN];
 
-   UNREFERENCED_PARAMETER(lParam);
+   if (ResizeDialogProc(hDlg, wMsg, wParam, lParam)) {
+      return TRUE;
+   }
 
    switch (wMsg)
    {
@@ -247,7 +249,6 @@ SearchDlgProc(register HWND hDlg, UINT wMsg, WPARAM wParam, LPARAM lParam)
    return TRUE;
 }
 
-
 /*--------------------------------------------------------------------------*/
 /*                                                                          */
 /*  RunDlgProc() -                                                          */
@@ -259,18 +260,20 @@ CALLBACK
 RunDlgProc(HWND hDlg, UINT wMsg, WPARAM wParam, LPARAM lParam)
 {
   LPTSTR p,pDir,pFile,pPar;
-  register DWORD ret;
+  DWORD ret;
   LPTSTR pDir2;
   TCHAR szTemp[MAXPATHLEN];
   TCHAR szTemp2[MAXPATHLEN];
   TCHAR sz3[MAXPATHLEN];
 
-  UNREFERENCED_PARAMETER(lParam);
+  if (ResizeDialogProc(hDlg, wMsg, wParam, lParam)) {
+      return TRUE;
+  }
 
   switch (wMsg)
     {
       case WM_INITDIALOG:
-      SetDlgDirectory(hDlg, NULL);
+          SetDlgDirectory(hDlg, NULL);
           SetWindowDirectory();          // and really set the DOS current directory
 
           SendDlgItemMessage(hDlg, IDD_NAME, EM_LIMITTEXT, COUNTOF(szTemp)-1, 0L);
@@ -282,6 +285,10 @@ RunDlgProc(HWND hDlg, UINT wMsg, WPARAM wParam, LPARAM lParam)
               LocalFree((HANDLE)p);
           }
           break;
+
+      case WM_SIZE:
+          SetDlgDirectory(hDlg, NULL);
+	  break;
 
       case WM_COMMAND:
           switch (GET_WM_COMMAND_ID(wParam, lParam))
@@ -314,7 +321,7 @@ RunDlgProc(HWND hDlg, UINT wMsg, WPARAM wParam, LPARAM lParam)
                   }
 
                   bLoadIt = IsDlgButtonChecked(hDlg, IDD_LOAD);
-				  bRunAs = IsDlgButtonChecked(hDlg, IDD_RUNAS);
+                  bRunAs = IsDlgButtonChecked(hDlg, IDD_RUNAS);
 
                   // Stop SaveBits flickering by invalidating the SaveBitsStuff.
                   // You can't just hide the window because it messes up the
@@ -403,7 +410,6 @@ MessWithRenameDirPath(LPTSTR pszPath)
    lstrcpy(pszPath, szPath);
 }
 
-
 //--------------------------------------------------------------------------*/
 //                                                                          */
 //  SuperDlgProc() -                                                        */
@@ -416,7 +422,7 @@ MessWithRenameDirPath(LPTSTR pszPath)
 
 INT_PTR
 CALLBACK
-SuperDlgProc(register HWND hDlg, UINT wMsg, WPARAM wParam, LPARAM lParam)
+SuperDlgProc(HWND hDlg, UINT wMsg, WPARAM wParam, LPARAM lParam)
 {
    UINT          len;
    INT           iCtrl;
@@ -434,7 +440,10 @@ JAPANEND
 
    static PCOPYINFO pCopyInfo;
 
-   UNREFERENCED_PARAMETER(lParam);
+
+   if (ResizeDialogProc(hDlg, wMsg, wParam, lParam)) {
+      return TRUE;
+   }
 
    switch (wMsg) {
    case WM_INITDIALOG:
@@ -461,14 +470,10 @@ JAPANEND
             LoadString(hAppInstance, IDS_COPY, szTitle, COUNTOF(szTitle));
             SetWindowText(hDlg, szTitle);
 
-            if (bJAPAN) {
-
-               //by yutakas 1992/10/29
-               LoadString(hAppInstance, IDS_KK_COPYFROMSTR, szStr, COUNTOF(szStr));
-               SetDlgItemText(hDlg, IDD_KK_TEXTFROM, szStr);
-               LoadString(hAppInstance, IDS_KK_COPYTOSTR, szStr, COUNTOF(szStr));
-               SetDlgItemText(hDlg, IDD_KK_TEXTTO, szStr);
-            }
+            LoadString(hAppInstance, IDS_KK_COPYFROMSTR, szStr, COUNTOF(szStr));
+            SetDlgItemText(hDlg, IDD_KK_TEXTFROM, szStr);
+            LoadString(hAppInstance, IDS_KK_COPYTOSTR, szStr, COUNTOF(szStr));
+            SetDlgItemText(hDlg, IDD_KK_TEXTTO, szStr);
 
             break;
          case IDM_HARDLINK:
@@ -478,13 +483,10 @@ JAPANEND
             LoadString(hAppInstance, IDS_HARDLINK, szTitle, COUNTOF(szTitle));
             SetWindowText(hDlg, szTitle);
 
-            if (bJAPAN) {
-
-               LoadString(hAppInstance, IDS_KK_HARDLINKFROMSTR, szStr, COUNTOF(szStr));
-               SetDlgItemText(hDlg, IDD_KK_TEXTFROM, szStr);
-               LoadString(hAppInstance, IDS_KK_HARDLINKTOSTR, szStr, COUNTOF(szStr));
-               SetDlgItemText(hDlg, IDD_KK_TEXTTO, szStr);
-            }
+            LoadString(hAppInstance, IDS_KK_HARDLINKFROMSTR, szStr, COUNTOF(szStr));
+            SetDlgItemText(hDlg, IDD_KK_TEXTFROM, szStr);
+            LoadString(hAppInstance, IDS_KK_HARDLINKTOSTR, szStr, COUNTOF(szStr));
+            SetDlgItemText(hDlg, IDD_KK_TEXTTO, szStr);
 
             break;
          case IDM_SYMLINK:
@@ -494,13 +496,10 @@ JAPANEND
             LoadString(hAppInstance, IDS_SYMLINK, szTitle, COUNTOF(szTitle));
             SetWindowText(hDlg, szTitle);
 
-            if (bJAPAN) {
-
-               LoadString(hAppInstance, IDS_KK_SYMLINKFROMSTR, szStr, COUNTOF(szStr));
-               SetDlgItemText(hDlg, IDD_KK_TEXTFROM, szStr);
-               LoadString(hAppInstance, IDS_KK_SYMLINKTOSTR, szStr, COUNTOF(szStr));
-               SetDlgItemText(hDlg, IDD_KK_TEXTTO, szStr);
-            }
+            LoadString(hAppInstance, IDS_KK_SYMLINKFROMSTR, szStr, COUNTOF(szStr));
+            SetDlgItemText(hDlg, IDD_KK_TEXTFROM, szStr);
+            LoadString(hAppInstance, IDS_KK_SYMLINKTOSTR, szStr, COUNTOF(szStr));
+            SetDlgItemText(hDlg, IDD_KK_TEXTTO, szStr);
 
             break;
          case IDM_RENAME:
@@ -508,13 +507,10 @@ JAPANEND
             LoadString(hAppInstance, IDS_RENAME, szTitle, COUNTOF(szTitle));
             SetWindowText(hDlg, szTitle);
 
-            if (bJAPAN) {
-               //by yutakas 1992/10/29
-               LoadString(hAppInstance, IDS_KK_RENAMEFROMSTR, szStr, COUNTOF(szStr));
-               SetDlgItemText(hDlg, IDD_KK_TEXTFROM, szStr);
-               LoadString(hAppInstance, IDS_KK_RENAMETOSTR, szStr, COUNTOF(szStr));
-               SetDlgItemText(hDlg, IDD_KK_TEXTTO, szStr);
-            }
+            LoadString(hAppInstance, IDS_KK_RENAMEFROMSTR, szStr, COUNTOF(szStr));
+            SetDlgItemText(hDlg, IDD_KK_TEXTFROM, szStr);
+            LoadString(hAppInstance, IDS_KK_RENAMETOSTR, szStr, COUNTOF(szStr));
+            SetDlgItemText(hDlg, IDD_KK_TEXTTO, szStr);
 
             // when renaming the current directory we cd up a level
             // (not really) and apply the appropriate adjustments
@@ -549,22 +545,22 @@ JAPANEND
             TCHAR szDirs[MAXPATHLEN];
             LPTSTR rgszDirs[MAX_DRIVES];
             int drive, driveCur;
-        	BOOL fFirst = TRUE;
+            BOOL fFirst = TRUE;
             
             iCtrl = IDD_TO;
             if (dwSuperDlgMode == IDM_RENAME)
-	            SetDlgItemText(hDlg, IDD_TO, p);
+                SetDlgItemText(hDlg, IDD_TO, p);
 
-			driveCur = (int)GetWindowLongPtr(hwndActive, GWL_TYPE);
+            driveCur = (int)GetWindowLongPtr(hwndActive, GWL_TYPE);
 
-			lstrcpy(szDirs, TEXT("Other: "));
+            LoadString(hAppInstance, IDS_CURDIRSARE, szDirs, COUNTOF(szDirs));
 
-   			GetAllDirectories(rgszDirs);
+            GetAllDirectories(rgszDirs);
 
-        	for (drive = 0; drive < MAX_DRIVES; drive++)
-        	{
-				if (drive != driveCur && rgszDirs[drive] != NULL)
-				{
+            for (drive = 0; drive < MAX_DRIVES; drive++)
+            {
+                if (drive != driveCur && rgszDirs[drive] != NULL)
+                {
                     if (!fFirst)
                     {
                         wcsncat_s(szDirs, MAXPATHLEN, TEXT(";"), 1);
@@ -575,16 +571,22 @@ JAPANEND
                     // but due to the limited width of the dialog, we can't see it all anyway.
                     wcsncat_s(szDirs, MAXPATHLEN, rgszDirs[drive], _TRUNCATE);
 
-	        		LocalFree(rgszDirs[drive]);
-	        	}
-        	}
+                    LocalFree(rgszDirs[drive]);
+                }
+            }
 
-	        SetDlgItemText(hDlg, IDD_DIRS, szDirs);
+            SetDlgItemText(hDlg, IDD_DIRS, szDirs);
          }
 
          SendDlgItemMessage(hDlg, iCtrl, EM_LIMITTEXT, COUNTOF(szTo) - 1, 0L);
          LocalFree((HANDLE)p);
          break;
+      }
+
+   case WM_SIZE:
+      {
+         SetDlgDirectory(hDlg, NULL);
+	 break;
       }
 
    case WM_NCACTIVATE:
@@ -711,7 +713,7 @@ SuperDlgExit:
             LocalFree(pszFrom);
             goto SuperDlgExit;
 
-		 } else {
+         } else {
 
             if (dwSuperDlgMode == IDM_RENAME && bTreeHasFocus) {
                MessWithRenameDirPath(pszFrom);
@@ -736,7 +738,7 @@ Error:
                MessageBox(hwndFrame, szMessage, szTitle, MB_OK | MB_ICONEXCLAMATION);
 
                LocalFree(pszFrom);
-	           goto SuperDlgExit;
+               goto SuperDlgExit;
             }
 
             pCopyInfo->pFrom = pszFrom;
@@ -1645,7 +1647,7 @@ FullPath:
 
 INT_PTR
 CALLBACK
-AttribsDlgProc(register HWND hDlg, UINT wMsg, WPARAM wParam, LPARAM lParam)
+AttribsDlgProc(HWND hDlg, UINT wMsg, WPARAM wParam, LPARAM lParam)
 {
    LPTSTR p, pSel;
    BOOL bRet;
@@ -1892,7 +1894,6 @@ DoHelp:
 }
 
 
-
 /*--------------------------------------------------------------------------*/
 /*                                                                          */
 /*  MakeDirDlgProc() -                                                      */
@@ -1909,12 +1910,18 @@ MakeDirDlgProc(HWND hDlg, UINT wMsg, WPARAM wParam, LPARAM lParam)
    TCHAR szPath[MAXPATHLEN*2];
    INT ret;
 
-   UNREFERENCED_PARAMETER(lParam);
+   if (ResizeDialogProc(hDlg, wMsg, wParam, lParam)) {
+      return TRUE;
+   }
 
    switch (wMsg) {
    case WM_INITDIALOG:
       SetDlgDirectory(hDlg, NULL);
       SendDlgItemMessage(hDlg, IDD_NAME, EM_LIMITTEXT, MAXPATHLEN-1, 0L);
+      break;
+
+   case WM_SIZE:
+      SetDlgDirectory(hDlg, NULL);
       break;
 
    case WM_COMMAND:

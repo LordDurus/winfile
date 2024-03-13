@@ -9,19 +9,19 @@
 
 LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
 
-FRAMEMENU MENU PRELOAD
+FRAMEMENU MENU
 BEGIN
     POPUP       "文件(&F)"
     BEGIN
     MENUITEM    "打开(&O)\tEnter",     IDM_OPEN
-    MENUITEM    "编辑\tF12",	    IDM_EDIT
+    MENUITEM    "编辑\tF12",        IDM_EDIT
     MENUITEM    "移动(&M)...\tF7",     IDM_MOVE
     MENUITEM    "复制(&C)...\tF8",     IDM_COPY
-    MENUITEM    "符號鏈接(&Y)...\tF11",    IDM_SYMLINK
-    MENUITEM    "硬鏈接(&K)...\tShift+F11",IDM_HARDLINK
+    MENUITEM    "符号链接(&Y)...\tF11",    IDM_SYMLINK
+    MENUITEM    "硬链接(&K)...\tShift+F11",IDM_HARDLINK
     MENUITEM    "复制到剪贴板(&B)...\tCtrl+C", IDM_COPYTOCLIPBOARD
-	MENUITEM    "剪切到剪贴板\tCtrl+X", IDM_CUTTOCLIPBOARD
-    MENUITEM	"粘贴(&P)\tCtrl+V", 	IDM_PASTE
+    MENUITEM    "剪切到剪贴板\tCtrl+X", IDM_CUTTOCLIPBOARD
+    MENUITEM    "粘贴(&P)\tCtrl+V",     IDM_PASTE
     MENUITEM    "删除(&D)...\tDel",  IDM_DELETE
     MENUITEM    "重命名(&N)...",   IDM_RENAME
     MENUITEM    "属性(&T)...\tAlt+Enter",IDM_ATTRIBS
@@ -36,10 +36,14 @@ BEGIN
     MENUITEM    "创建目录(&E)...\tCtrl+Shift+N", IDM_MAKEDIR
     MENUITEM    "搜索(&H)...\tCtrl+F",       IDM_SEARCH
     MENUITEM    "选择文件(&F)...", IDM_SELECT
-	MENUITEM    "打开 Bash...\tCtrl+B", IDM_STARTBASHSHELL
-	MENUITEM    "打开命令提示符(&L)...\tCtrl+K", IDM_STARTCMDSHELL
-    MENUITEM    "打开 PowerShell(&W)...\tCtrl+P", IDM_STARTPOWERSHELL
-	MENUITEM    "转到目录(&G)...\tCtrl+G", IDM_GOTODIR
+    POPUP       "打开 (&.)"
+    BEGIN
+    MENUITEM    "打开 &Bash...\tCtrl+B", IDM_STARTBASHSHELL
+    MENUITEM    "打开命令提示符(&C)...\tCtrl+K", IDM_STARTCMDSHELL
+    MENUITEM    "打开 &PowerShell...\tCtrl+P", IDM_STARTPOWERSHELL
+    MENUITEM    "打开 &Explorer...\tCtrl+E", IDM_STARTEXPLORER
+    END
+    MENUITEM    "转到目录(&G)...\tCtrl+G", IDM_GOTODIR
     MENUITEM    SEPARATOR
     MENUITEM    "退出(&X)",            IDM_EXIT
     END
@@ -86,7 +90,7 @@ BEGIN
     MENUITEM    "确认(&C)...",     IDM_CONFIRM
     MENUITEM    "字体(&F)...",             IDM_FONT
     MENUITEM    "自定义工具栏(&B)...", IDM_TOOLBARCUST
-    MENUITEM    "首选项(&P)", IDM_PREF
+    MENUITEM    "首选项(&P)...", IDM_PREF
     MENUITEM    SEPARATOR
     MENUITEM    "工具栏(&T)",                 IDM_TOOLBAR
     MENUITEM    "驱动器栏(&D)",                IDM_DRIVEBAR
@@ -126,35 +130,36 @@ BEGIN
 
 END
 
-CTXMENU MENU PRELOAD 
+CTXMENU MENU
 BEGIN
-	POPUP "Dummy Popup"
-	BEGIN
-	MENUITEM    "新建窗口(&N)\tCtrl+Shift Enter",     IDM_NEWWINDOW
+    POPUP "Dummy Popup"
+    BEGIN
+    MENUITEM    "新建窗口(&N)\tCtrl+Shift Enter",     IDM_NEWWINDOW
     MENUITEM    "打开(&O)\tEnter",     IDM_OPEN
-    MENUITEM    "编辑\tF12",	    IDM_EDIT
+    MENUITEM    "编辑\tF12",        IDM_EDIT
     MENUITEM    "移动(&M)...\tF7",     IDM_MOVE
     MENUITEM    "复制(&C)...\tF8",     IDM_COPY
-    MENUITEM    "符號鏈接(&Y)...\tF11",    IDM_SYMLINK
-    MENUITEM    "硬鏈接(&K)...\tShift+F11",IDM_HARDLINK
-	MENUITEM    "复制到剪贴板(&B)\tCtrl+C", IDM_COPYTOCLIPBOARD
-	MENUITEM    "剪切到剪贴板\tCtrl+X", IDM_CUTTOCLIPBOARD
-	MENUITEM	"粘贴(&P)\tCtrl+V", IDM_PASTE
-	MENUITEM    "删除(&D)...\tDel",  IDM_DELETE
+    MENUITEM    "符号链接(&Y)...\tF11",    IDM_SYMLINK
+    MENUITEM    "硬链接(&K)...\tShift+F11",IDM_HARDLINK
+    MENUITEM    "复制到剪贴板(&B)\tCtrl+C", IDM_COPYTOCLIPBOARD
+    MENUITEM    "剪切到剪贴板\tCtrl+X", IDM_CUTTOCLIPBOARD
+    MENUITEM    "粘贴(&P)\tCtrl+V", IDM_PASTE
+    MENUITEM    "删除(&D)...\tDel",  IDM_DELETE
     MENUITEM    "重命名(&N)...\tF2",   IDM_RENAME
     MENUITEM    "属性(&T)...\tAlt+Enter",IDM_ATTRIBS
     MENUITEM    "运行(&R)...",          IDM_RUN
     MENUITEM    "打开 Bash...", IDM_STARTBASHSHELL
-	MENUITEM    "打开命令提示符(&L)...", IDM_STARTCMDSHELL
-	MENUITEM    "打开 PowerShell(&W)...", IDM_STARTPOWERSHELL
-	MENUITEM    "转到目录(&G)...", IDM_GOTODIR
-	END
+    MENUITEM    "打开命令提示符(&L)...", IDM_STARTCMDSHELL
+    MENUITEM    "打开 PowerShell(&W)...", IDM_STARTPOWERSHELL
+    MENUITEM    "打开 Explorer(&X)...", IDM_STARTEXPLORER
+    MENUITEM    "转到目录(&G)...", IDM_GOTODIR
+    END
 END
 
 
 #define SUGGEST(id,err,flags,str) id+IDS_SUGGESTBEGIN str
 /*              0....5....1....56...2....5....3.2..5....4....5....5....6....5....7....5....8....5....9....5....0....5....1....5....2....5..8 */
-STRINGTABLE DISCARDABLE PRELOAD
+STRINGTABLE
 BEGIN
 //    IDS_ENDSESSION          "Exit Windows"                  /* 32 */
 //    IDS_ENDSESSIONMSG       "This will end your Windows session."                                                                                      /* 128 */
@@ -195,7 +200,7 @@ BEGIN
 
     IDS_LABELDISKERR        "文件管理器无法为软盘命名。\n\n请确认软盘未作写保护、并非网络驱动器，而且输入正确的名称。\n名称不可包含下列字符: \n[空格] * ? / \\ | . , ; : + = [ ] ( ) & ^ < > "" "
 
-	IDS_SEARCHNOMATCHES     "未找到匹配的文件。"
+    IDS_SEARCHNOMATCHES     "未找到匹配的文件。"
     IDS_SEARCHREFRESH       "这个驱动器的内容已有变化。您想更新“搜索结果“窗口吗？"
     IDS_LABELACCESSDENIED   "您必须以管理员身份登录此工作站，以便在硬盘上运行此项操作。"
 
@@ -226,7 +231,7 @@ BEGIN
     IDS_MOUSECONFIRM,       "确认鼠标操作"       /* 32 */
     IDS_COPYMOUSECONFIRM,   "确定把所选文件或目录复制到 %s ？"
     IDS_MOVEMOUSECONFIRM,   "确定把所选文件或目录移动到 %s ？"
-    IDS_LINKMOUSECONFIRM,   "您確定要將選定的文件或目錄鏈接到 %s？"
+    IDS_LINKMOUSECONFIRM,   "确定把所选文件或目录链接到 %s？"
     IDS_EXECMOUSECONFIRM,   "确定要使用 %s 打开 %s ？"                                                          /* 128 */
 
     IDS_WINFILE,            "文件管理器"                  /* 32 */
@@ -245,12 +250,22 @@ BEGIN
     IDS_PRINTONLYONE        "文件管理器不能同时打印多份文件。\n\n只选择一份文件，然后重试。"                                               /* 128 */
 
     IDS_CURDIRIS,           "当前目录: %s"                                                                                                    /* 128 */
+    IDS_CURDIRSARE,         "Other: "
     IDS_COPY,               "复制"                          /* 32 */
     IDS_RENAME,             "重命名"                        /* 32 */
     IDS_FORMAT,             "格式化磁盘"                   /* 32 */
     IDS_FORMATSELDISK,      "选择要格式化的磁盘。"
     IDS_SYMLINK,            "符号链接"                       /* 32 */
     IDS_HARDLINK,           "硬链接"                      /* 32 */
+
+    IDS_KK_COPYFROMSTR,     "从(&F):"
+    IDS_KK_COPYTOSTR,       "复制到(&T):"
+    IDS_KK_RENAMEFROMSTR,   "原名(&F):"
+    IDS_KK_RENAMETOSTR,     "重命名为(&T):"
+    IDS_KK_HARDLINKFROMSTR, "从(&F):"
+    IDS_KK_HARDLINKTOSTR,   "硬链接到(&T):"
+    IDS_KK_SYMLINKFROMSTR,  "从(&F):"
+    IDS_KK_SYMLINKTOSTR,    "符号链接到(&T):"
 
     IDS_CREATINGMSG,        "创建:"                     /* 32 */
     IDS_REMOVINGDIRMSG,     "正在删除:"                     /* 32 */
@@ -290,7 +305,7 @@ BEGIN
     IDS_COPYERROR + FUNC_LABEL    "设置磁盘卷标出错"
     IDS_COPYERROR + FUNC_LINK        "在创建符号连接时出现错误"
     IDS_COPYERROR + FUNC_HARD        "在创建硬连接时出现错误"
-    IDS_COPYERROR + FUNC_JUNC        "在创建目录连接点时出现错误"
+    IDS_COPYERROR + FUNC_JUNC        "在创建目录联接时出现错误"
 
     /* The first %s is replaced by a file name. The second %s is replaced
      * by one of the "reasons" below. */
@@ -299,9 +314,9 @@ BEGIN
     IDS_VERBS + FUNC_MOVE       "文件管理器无法移动 %s: %s"
     IDS_VERBS + FUNC_DELETE     "文件管理器无法删除 %s: %s"
     IDS_VERBS + FUNC_RENAME     "文件管理器无法重命名 %s: %s"
-    IDS_VERBS + FUNC_LINK       "文件管理器無法創建符號鏈接 %s: %s"
-    IDS_VERBS + FUNC_HARD       "文件管理器無法創建硬鏈接 %s: %s"
-    IDS_VERBS + FUNC_JUNC       "文件管理器無法創建聯結 %s: %s"
+    IDS_VERBS + FUNC_LINK       "文件管理器无法创建符号链接 %s: %s"
+    IDS_VERBS + FUNC_HARD       "文件管理器无法创建硬链接 %s: %s"
+    IDS_VERBS + FUNC_JUNC       "文件管理器无法创建目录联接 %s: %s"
     IDS_ACTIONS + 1             "文件管理器无法创建目录 %s: %s"
     IDS_ACTIONS + 2             "文件管理器无法删除目录 %s: %s"
     IDS_REPLACING               "文件管理器无法创建或替换 %s: %s"
@@ -321,7 +336,6 @@ BEGIN
     IDS_BUSYFORMATQUITVERIFY    "文件管理器正在格式化软盘。退出文件管理器将会中断该操作。"
     IDS_BUSYCOPYQUITVERIFY      "文件管理器正在复制软盘。退出文件管理器将会中断该操作。"
     IDS_PERCENTCOMPLETE         "完成百分比"
-    IDS_FORMATSELECTDLGTITLE    "格式化磁盘"
 
     IDS_12MB                    "1%s2 MB"
     IDS_360KB                   "360K"
@@ -489,6 +503,10 @@ JAPANEND
     IDS_COPYINGDISKTITLE        "正在复制磁盘"
     IDS_SEARCHING               "正在搜索..."
 
+JAPANBEGIN
+    IDS_WRNNOSHIFTJIS           "このフォントを使用すると漢字の表示が\nできなくなります。"
+JAPANEND
+
     IDS_INITUPDATEFAIL          "无法初始化后台更新支持。文件管理器将会退出。"
     IDS_INITUPDATEFAILTITLE     "文件管理器初始化"
 
@@ -505,7 +523,7 @@ END
 
 /* Help strings for the popup menus.
  */
-STRINGTABLE LOADONCALL MOVEABLE DISCARDABLE
+STRINGTABLE
 BEGIN
     MH_POPUP+IDM_FILE,          "控制文件的命令"
     MH_POPUP+IDM_DISK,          "控制磁盘的命令"
@@ -520,15 +538,15 @@ END
 
 // Help strings for the "standard" toolbar items.
 
-STRINGTABLE LOADONCALL MOVEABLE DISCARDABLE
+STRINGTABLE
 BEGIN
     MH_MYITEMS+IDM_OPEN,        "打开所选项目"
     MH_MYITEMS+IDM_EDIT,        "使用记事本编辑所选项目"
     MH_MYITEMS+IDM_MOVE,        "移动所选的项目"
     MH_MYITEMS+IDM_COPY,        "复制文件及目录"
     MH_MYITEMS+IDM_COPYTOCLIPBOARD, "复制文件到剪贴板"
-	MH_MYITEMS+IDM_CUTTOCLIPBOARD, "剪切一个或多个文件到剪贴板"
-    MH_MYITEMS+IDM_PASTE,		"粘贴剪切板中的文件到当前目录"
+    MH_MYITEMS+IDM_CUTTOCLIPBOARD, "剪切一个或多个文件到剪贴板"
+    MH_MYITEMS+IDM_PASTE,       "粘贴剪切板中的文件到当前目录"
     MH_MYITEMS+IDM_COMPRESS,    "压缩文件或目录"
     MH_MYITEMS+IDM_UNCOMPRESS,  "解压缩文件或目录"
     MH_MYITEMS+IDM_DELETE,      "删除文件及目录"
@@ -609,7 +627,7 @@ END
 
 // Strings for menu items that may be added at init time.
 
-STRINGTABLE MOVEABLE DISCARDABLE
+STRINGTABLE
 BEGIN
     IDS_CONNECT,                "映射网络驱动器(&N)..."
     IDS_DISCONNECT,             "断开网络驱动器(&D)..."

@@ -9,7 +9,7 @@
 
 LANGUAGE LANG_POLISH, SUBLANG_POLISH_POLAND
 
-FRAMEMENU MENU PRELOAD
+FRAMEMENU MENU
 BEGIN
     POPUP       "&Plik"
     BEGIN
@@ -36,9 +36,13 @@ BEGIN
     MENUITEM    "U&twórz katalog...\tCtrl+Shift+N", IDM_MAKEDIR
     MENUITEM    "Szuk&aj...\tCtrl+F",             IDM_SEARCH
     MENUITEM    "&Zaznacz pliki...",              IDM_SELECT
-    MENUITEM    "Uruchom powłokę Bash...\tCtrl+B",      IDM_STARTBASHSHELL
-    MENUITEM    "U&ruchom Wiersz polecenia...\tCtrl+K", IDM_STARTCMDSHELL
-    MENUITEM    "Uruchom Po&werShell...\tCtrl+P",       IDM_STARTPOWERSHELL
+    POPUP       "Uruchom (&.)"
+    BEGIN
+    MENUITEM    "Uruchom powłokę &Bash...\tCtrl+B", IDM_STARTBASHSHELL
+    MENUITEM    "Uruchom Wiersz pole&cenia...\tCtrl+K", IDM_STARTCMDSHELL
+    MENUITEM    "Uruchom &PowerShell...\tCtrl+P", IDM_STARTPOWERSHELL
+    MENUITEM    "Uruchom &Explorer...\tCtrl+E",   IDM_STARTEXPLORER
+    END
     MENUITEM    "Skocz do kata&logu...\tCtrl+G",  IDM_GOTODIR
     MENUITEM    SEPARATOR
     MENUITEM    "Za&kończ",                       IDM_EXIT
@@ -86,7 +90,7 @@ BEGIN
     MENUITEM    "&Potwierdzanie...",                          IDM_CONFIRM
     MENUITEM    "&Czcionka...",                               IDM_FONT
     MENUITEM    "Dostosuj pasek nar&zędzi...",                IDM_TOOLBARCUST
-    MENUITEM    "&Dodatkowe preferencje",                     IDM_PREF
+    MENUITEM    "&Dodatkowe preferencje...",                  IDM_PREF
     MENUITEM    SEPARATOR
     MENUITEM    "Pasek &narzędzi",                            IDM_TOOLBAR
     MENUITEM    "Pasek &dysków",                              IDM_DRIVEBAR
@@ -126,7 +130,7 @@ BEGIN
 
 END
 
-CTXMENU MENU PRELOAD 
+CTXMENU MENU
 BEGIN
     POPUP "Menu prawego przycisku"
     BEGIN
@@ -147,6 +151,7 @@ BEGIN
     MENUITEM    "Uruchom powłokę Bash...",        IDM_STARTBASHSHELL
     MENUITEM    "U&ruchom Wiersz polecenia...",   IDM_STARTCMDSHELL
     MENUITEM    "Uruchom Po&werShell...",         IDM_STARTPOWERSHELL
+    MENUITEM    "Uruchom E&xplorer...",           IDM_STARTEXPLORER
     MENUITEM    "Skocz do kata&logu...\tCtrl+G",  IDM_GOTODIR
     END
 END
@@ -154,7 +159,7 @@ END
 
 #define SUGGEST(id,err,flags,str) id+IDS_SUGGESTBEGIN str
 /*              0....5....1....56...2....5....3.2..5....4....5....5....6....5....7....5....8....5....9....5....0....5....1....5....2....5..8 */
-STRINGTABLE DISCARDABLE PRELOAD
+STRINGTABLE
 BEGIN
 //    IDS_ENDSESSION          "Zamknij system"                  /* 32 */
 //    IDS_ENDSESSIONMSG       "Kończy sesję systemu Windows."                                                                                      /* 128 */
@@ -246,6 +251,7 @@ BEGIN
     IDS_PRINTONLYONE        "Menedżer plików nie może drukować wielu plików.\n\nWybierz tylko jeden plik i spróbuj ponownie."                                               /* 128 */
 
     IDS_CURDIRIS,           "Bieżący katalog: %s"                                                                                                    /* 128 */
+    IDS_CURDIRSARE,         "Other: "
     IDS_COPY,               "Kopiuj"                          /* 32 */
     IDS_RENAME,             "Zmień nazwę"                     /* 32 */
     IDS_FORMAT,             "Formatuj dysk"                   /* 32 */
@@ -253,16 +259,14 @@ BEGIN
     IDS_SYMLINK,            "Dowiązanie symboliczne"                       /* 32 */
     IDS_HARDLINK,           "Twardy link"                      /* 32 */
 
-JAPANBEGIN
-    IDS_KK_COPYFROMSTR,     "コピー元(&F):"
-    IDS_KK_COPYTOSTR,       "コピー先(&T):"
-    IDS_KK_RENAMEFROMSTR,   "元の名前(&F):"
-    IDS_KK_RENAMETOSTR,     "新しい名前(&T):"
-    IDS_KK_HARDLINKFROMSTR, "ハードリンク元(&F):"
-    IDS_KK_HARDLINKTOSTR,   "ハードリンク先(&T):"
-    IDS_KK_SYMLINKFROMSTR,  "シンボリックリンク元(&F):"
-    IDS_KK_SYMLINKTOSTR,    "シンボリックリンク先(&T):"
-  JAPANEND
+    IDS_KK_COPYFROMSTR,     "&Z:"
+    IDS_KK_COPYTOSTR,       "&Do/Na:"
+    IDS_KK_RENAMEFROMSTR,   "&Z:"
+    IDS_KK_RENAMETOSTR,     "&Do/Na:"
+    IDS_KK_HARDLINKFROMSTR, "&Z:"
+    IDS_KK_HARDLINKTOSTR,   "&Do/Na:"
+    IDS_KK_SYMLINKFROMSTR,  "&Z:"
+    IDS_KK_SYMLINKTOSTR,    "&Do/Na:"
 
 //    IDS_MAKESYSDISK,        "Utwórz dysk systemowy"              /* 32 */
 
@@ -330,16 +334,11 @@ JAPANBEGIN
 
     IDS_COPYINGTITLE            "Kopiowanie..."
 
-JAPANBEGIN
-    IDS_KK_COPY                 "コピー先:"
-JAPANEND
-
     IDS_QUICKFORMATTINGTITLE    "Szybkie formatowanie..."
 
     IDS_BUSYFORMATQUITVERIFY    "Menedżer plików obecnie formatuje dysk. Zakończenie działania Menedżera plików spowoduje przerwanie tej operacji."
     IDS_BUSYCOPYQUITVERIFY      "Menedżer plików obecnie kopiuje dysk. Zakończenie działania Menedżera plików spowoduje przerwanie tej operacji."
     IDS_PERCENTCOMPLETE         "Procent ukończono"
-    IDS_FORMATSELECTDLGTITLE    "Sformatuj dysk"
 
     IDS_12MB                    "1%s2 MB"
     IDS_360KB                   "360K"
@@ -520,7 +519,7 @@ JAPANEND
     IDS_COMPRESS_ATTRIB_ERR     "Menedżer plików nie może zmienić atrybutów kompresji dla %s."
     IDS_NTLDRCOMPRESSERR        "Plik %s nie zostanie skompresowany. Kompresja tego pliku może spowodować, że rozruch systemu nie będzie możliwy."
     IDS_MULTICOMPRESSERR        "Menedżer plików dokonuje obecnie kompresji/dekompresji plików.\nMusisz poczekać na zakończenie procesu przed próbą kompresji/dekompresji dalszych plików."
-      
+
     IDS_EDITFILTER              "Programy (*.exe)\0*.exe\0"
 
 END
@@ -528,7 +527,7 @@ END
 
 /* Help strings for the popup menus.
  */
-STRINGTABLE LOADONCALL MOVEABLE DISCARDABLE
+STRINGTABLE
 BEGIN
     MH_POPUP+IDM_FILE,          "Polecenia do pracy z plikami"
     MH_POPUP+IDM_DISK,          "Polecenia do pracy z dyskami"
@@ -543,7 +542,7 @@ END
 
 // Help strings for the "standard" toolbar items.
 
-STRINGTABLE LOADONCALL MOVEABLE DISCARDABLE
+STRINGTABLE
 BEGIN
     MH_MYITEMS+IDM_OPEN,             "Otwiera zaznaczony element"
     MH_MYITEMS+IDM_EDIT,             "Otwiera zaznaczony element w celu edycji"
@@ -632,7 +631,7 @@ END
 
 // Strings for menu items that may be added at init time.
 
-STRINGTABLE MOVEABLE DISCARDABLE
+STRINGTABLE
 BEGIN
     IDS_CONNECT,                "&Podłącz dysk sieciowy..."
     IDS_DISCONNECT,             "O&dłącz dysk sieciowy..."

@@ -99,6 +99,8 @@
 #define IDM_SYMLINK         132
 #define IDM_HARDLINK        133
 
+#define IDM_STARTEXPLORER   134
+
 // This IDM_ is reserved for IDH_GROUP_ATTRIBS
 #define IDM_GROUP_ATTRIBS   199
 
@@ -329,7 +331,8 @@
 #define IDS_FORMATSELDISK   146
 #define IDS_SYMLINK         147
 #define IDS_HARDLINK        148
-//#define IDS_DISCONSELDISK   149
+#define IDS_CURDIRSARE      149
+//#define IDS_DISCONSELDISK   149 reused
 #define IDS_CREATINGMSG     150
 #define IDS_REMOVINGMSG     151
 #define IDS_COPYINGMSG      152
@@ -506,8 +509,6 @@
 
 #define IDS_PERCENTCOMPLETE   326
 
-#define IDS_FORMATSELECTDLGTITLE 327
-
 #define IDS_DRIVEBASE       350
 #define IDS_12MB            354
 #define IDS_360KB           353
@@ -613,15 +614,14 @@
 
 // IDS_ from 1100 to 1199 reserved for suggestions!
 
-JAPANBEGIN
 #define IDS_KK_COPYFROMSTR              2000
 #define IDS_KK_COPYTOSTR                2001
 #define IDS_KK_RENAMEFROMSTR            2002
 #define IDS_KK_RENAMETOSTR              2003
-#define IDS_KK_COPY                     2004
+JAPANBEGIN
 #define IDS_WRNNOSHIFTJIS               2005
+JAPANEND
 #define IDS_KK_HARDLINKFROMSTR          2006
 #define IDS_KK_HARDLINKTOSTR            2007
 #define IDS_KK_SYMLINKFROMSTR           2008
 #define IDS_KK_SYMLINKTOSTR             2009
-JAPANEND

@@ -37,7 +37,7 @@ DWORD cNodes;
 VOID
 GetTreePathIndirect(
     PDNODE pNode,
-    register LPTSTR szDest);
+    LPTSTR szDest);
 
 VOID
 ScanDirLevel(
@@ -80,8 +80,8 @@ FindItemFromPath(
     HWND hwndLB,
     LPTSTR lpszPath,
     BOOL bReturnParent,
-	DWORD *pIndex,
-	PDNODE *ppNode);
+    DWORD *pIndex,
+    PDNODE *ppNode);
 
 INT
 BuildTreeName(
@@ -136,9 +136,9 @@ int GetDragStatusText(int iOperation)
 /*--------------------------------------------------------------------------*/
 
 VOID
-GetTreePathIndirect(PDNODE pNode, register LPTSTR szDest)
+GetTreePathIndirect(PDNODE pNode, LPTSTR szDest)
 {
-   register PDNODE    pParent;
+   PDNODE    pParent;
 
    pParent = pNode->pParent;
 
@@ -161,7 +161,7 @@ GetTreePathIndirect(PDNODE pNode, register LPTSTR szDest)
 /*--------------------------------------------------------------------------*/
 
 VOID
-GetTreePath(PDNODE pNode, register LPTSTR szDest)
+GetTreePath(PDNODE pNode, LPTSTR szDest)
 {
    szDest[0] = CHAR_NULL;
    GetTreePathIndirect(pNode, szDest);
@@ -176,7 +176,7 @@ GetTreePath(PDNODE pNode, register LPTSTR szDest)
 
 
 //  SetNodeAttribs
-//                              
+//
 //  Set node attributes for directory/junction/symlink
 //
 VOID
@@ -189,11 +189,10 @@ SetNodeAttribs(PDNODE pNode, LPTSTR szPath)
 
    //
    // Determine which kind of Reparse Point
-   // 
+   //
    if (pNode->dwAttribs & ATTR_REPARSE_POINT) {
 
-      TCHAR szTemp[MAXPATHLEN];
-      int tag = DecodeReparsePoint(szPath, szTemp, MAXPATHLEN);
+      DWORD tag = DecodeReparsePoint(szPath, NULL, 0);
       switch (tag) {
       case IO_REPARSE_TAG_MOUNT_POINT:
          pNode->dwAttribs |= ATTR_JUNCTION;
@@ -425,7 +424,7 @@ InsertDirectory(
       }
       else
       {
-	     int iCmp;
+         int iCmp;
          do
          {
             iMid = (iMax + iMin) / 2;
@@ -515,8 +514,7 @@ InsertDirectory(
    {
       *ppNode = pNode;
    }
-
-   return (iMax);
+   return iMax;
 }
 
 
@@ -1188,7 +1186,7 @@ FillTreeListbox(HWND hwndTC,
                                &pNode,
                                IsCasePreservedDrive(DRIVEID(szDefaultDir)),
                                bPartialSort,
-                               (DWORD)(-1) );
+                               INVALID_FILE_ATTRIBUTES );
 
       if (pNode) {
 
@@ -1248,61 +1246,61 @@ FillTreeListbox(HWND hwndTC,
 
 VOID
 FillOutTreeList(HWND hwndTC,
-	LPTSTR szDir,
-	DWORD nIndex,
-	PDNODE pNode)
+   LPTSTR szDir,
+   DWORD nIndex,
+   PDNODE pNode)
 {
-	HWND  hwndLB;
-	DWORD dwAttribs;
-	LPTSTR  p;
-	TCHAR  szExists[MAXPATHLEN + 1];	// path that exists in tree
-	TCHAR  szExpand[MAXPATHLEN + 1];	// sequence of null terminated strings to expand
+   HWND  hwndLB;
+   DWORD dwAttribs;
+   LPTSTR  p;
+   TCHAR  szExists[MAXPATHLEN + 1];    // path that exists in tree
+   TCHAR  szExpand[MAXPATHLEN + 1];   // sequence of null terminated strings to expand
 
-	hwndLB = GetDlgItem(hwndTC, IDCW_TREELISTBOX);
+   hwndLB = GetDlgItem(hwndTC, IDCW_TREELISTBOX);
 
-	// TODO: assert pNode is at nIndex.  and szDir begins with X:\  szDir is a superset of szExists
+   // TODO: assert pNode is at nIndex.  and szDir begins with X:\  szDir is a superset of szExists
 
-	SendMessage(hwndLB, WM_SETREDRAW, FALSE, 0L);
+   SendMessage(hwndLB, WM_SETREDRAW, FALSE, 0L);
 
-	dwAttribs = (DWORD)GetWindowLongPtr(GetParent(hwndTC), GWL_ATTRIBS);
-	dwAttribs = ATTR_DIR | (dwAttribs & (ATTR_HS | ATTR_JUNCTION));
+   dwAttribs = (DWORD)GetWindowLongPtr(GetParent(hwndTC), GWL_ATTRIBS);
+   dwAttribs = ATTR_DIR | (dwAttribs & (ATTR_HS | ATTR_JUNCTION));
 
-	// get path to node that already exists in tree; will start reading from there
-	GetTreePath(pNode, szExists);
+   // get path to node that already exists in tree; will start reading from there
+   GetTreePath(pNode, szExists);
 
-	// convert szDir into a sequence of null terminated strings for each directory segment
-	// TODO: shared function
-	lstrcpy(szExpand, szDir + lstrlen(szExists) + 1);  // skip temp path (that which is already in tree) and intervening '\\'
-	p = szExpand;
+   // convert szDir into a sequence of null terminated strings for each directory segment
+   // TODO: shared function
+   lstrcpy(szExpand, szDir + lstrlen(szExists) + 1);  // skip temp path (that which is already in tree) and intervening '\\'
+   p = szExpand;
 
-	while (*p) {                // null out all slashes
+   while (*p) {                // null out all slashes
 
-		while (*p && *p != CHAR_BACKSLASH)
-			++p;
+      while (*p && *p != CHAR_BACKSLASH)
+         ++p;
 
-		if (*p)
-			*p++ = CHAR_NULL;
-	}
-	p++;
-	*p = CHAR_NULL;  // double null terminated
+      if (*p)
+         *p++ = CHAR_NULL;
+   }
+   p++;
+   *p = CHAR_NULL;  // double null terminated
 
-    bCancelTree = 0;
+   bCancelTree = 0;
 
-	if (!ReadDirLevel(hwndTC, pNode, szExists, pNode->nLevels + 1, nIndex, dwAttribs, FALSE, szExpand, FALSE)) {
-		SPC_SET_NOTREE(qFreeSpace);
-	}
+   if (!ReadDirLevel(hwndTC, pNode, szExists, pNode->nLevels + 1, nIndex, dwAttribs, FALSE, szExpand, FALSE)) {
+      SPC_SET_NOTREE(qFreeSpace);
+   }
 
-	if (FindItemFromPath(hwndLB, szDir, FALSE, NULL, &pNode)) {
-		// found desired path in newly expanded list; select
-		SendMessage(hwndLB, LB_SELECTSTRING, (WPARAM)-1, (LPARAM)pNode);
-	}
+   if (FindItemFromPath(hwndLB, szDir, FALSE, NULL, &pNode)) {
+      // found desired path in newly expanded list; select
+      SendMessage(hwndLB, LB_SELECTSTRING, (WPARAM)-1, (LPARAM)pNode);
+   }
 
-	UpdateStatus(GetParent(hwndTC));  // Redraw the Status Bar
+   UpdateStatus(GetParent(hwndTC));  // Redraw the Status Bar
 
-	SendMessage(hwndLB, WM_SETREDRAW, TRUE, 0L);
+   SendMessage(hwndLB, WM_SETREDRAW, TRUE, 0L);
 
-	InvalidateRect(hwndLB, NULL, TRUE);
-	UpdateWindow(hwndLB);                 // make this look a bit better
+   InvalidateRect(hwndLB, NULL, TRUE);
+   UpdateWindow(hwndLB);                 // make this look a bit better
 }
 
 
@@ -1331,23 +1329,26 @@ FindItemFromPath(
    DWORD *pIndex,
    PDNODE *ppNode)
 {
-  register DWORD     i;
-  register LPTSTR    p;
+  DWORD              i;
+  LPTSTR             p;
   PDNODE             pNode;
   DWORD              iPreviousNode;
   PDNODE             pPreviousNode;
   TCHAR              szElement[1+MAXFILENAMELEN+1];
 
-  if (pIndex) {
-	  *pIndex = (DWORD)-1;
-  }
-  if (ppNode) {
-	  *ppNode = NULL;
-  }
+  if (pIndex)
+    {
+      *pIndex = (DWORD)-1;
+    }
+  if (ppNode)
+    {
+      *ppNode = NULL;
+    }
 
-  if (!lpszPath || lstrlen(lpszPath) < 3 || lpszPath[1] != CHAR_COLON) {
+  if (!lpszPath || lstrlen(lpszPath) < 3 || lpszPath[1] != CHAR_COLON)
+    {
       return FALSE;
-  }
+    }
 
   i = 0;
   iPreviousNode = (DWORD)-1;
@@ -1384,9 +1385,9 @@ FindItemFromPath(
           /* We're at the end of a path which includes a filename.  Return
            * the previously found parent.
            */
-		  if (pIndex) {
-			  *pIndex = iPreviousNode;
-		  }
+          if (pIndex) {
+              *pIndex = iPreviousNode;
+          }
           if (ppNode) {
               *ppNode = pPreviousNode;
           }
@@ -1396,23 +1397,25 @@ FindItemFromPath(
       while (TRUE)
         {
           /* Out of LB items?  Not found. */
-		  if (SendMessage(hwndLB, LB_GETTEXT, i, (LPARAM)&pNode) == LB_ERR)
-		  {
-			  if (pIndex) {
-				  *pIndex = iPreviousNode;
-			  }
-			  if (ppNode) {
-				  *ppNode = pPreviousNode;
-			  }
+          if (SendMessage(hwndLB, LB_GETTEXT, i, (LPARAM)&pNode) == LB_ERR)
+            {
+              if (pIndex)
+                {
+                  *pIndex = iPreviousNode;
+                }
+              if (ppNode)
+                {
+                  *ppNode = pPreviousNode;
+                }
               return FALSE;
-		  }
+            }
 
           if (pNode->pParent == pPreviousNode)
             {
               if (!lstrcmpi(szElement, pNode->szName))
                 {
                   /* We've found the element... */
-				  iPreviousNode = i;
+                  iPreviousNode = i;
                   pPreviousNode = pNode;
                   break;
                 }
@@ -1420,12 +1423,14 @@ FindItemFromPath(
           i++;
         }
     }
-  if (pIndex) {
-	  *pIndex = iPreviousNode;
-  }
-  if (ppNode) {
+  if (pIndex)
+    {
+      *pIndex = iPreviousNode;
+    }
+  if (ppNode)
+    {
       *ppNode = pPreviousNode;
-  }
+    }
 
   return TRUE;
 }
@@ -2086,7 +2091,7 @@ ExpandLevel(HWND hWnd, WPARAM wParam, INT nIndex, LPTSTR szPath)
 LRESULT
 CALLBACK
 TreeControlWndProc(
-   register HWND hwnd,
+   HWND hwnd,
    UINT uMsg,
    WPARAM wParam,
    LPARAM lParam)
@@ -2094,7 +2099,6 @@ TreeControlWndProc(
    INT    iSel;
    INT    i, j;
    INT    nIndex;
-   DWORD  dwTemp;
    PDNODE pNode, pNodeNext;
    HWND  hwndLB;
    HWND  hwndParent;
@@ -2222,16 +2226,16 @@ TreeControlWndProc(
       DWORD i;
 
       if (FindItemFromPath(hwndLB, (LPTSTR)lParam, wParam != 0, &i, NULL))
-	  {
-		  SendMessage(hwndLB, LB_SETCURSEL, i, 0L);
+      {
+         SendMessage(hwndLB, LB_SETCURSEL, i, 0L);
 
-		  // update dir window if it exists (which also updates MDI text)
-		  SendMessage(hwnd,
-			  WM_COMMAND,
-			  GET_WM_COMMAND_MPS(IDCW_TREELISTBOX,
-				  hwndLB,
-				  LBN_SELCHANGE));
-	  }
+         // update dir window if it exists (which also updates MDI text)
+         SendMessage(hwnd,
+            WM_COMMAND,
+            GET_WM_COMMAND_MPS(IDCW_TREELISTBOX,
+               hwndLB,
+               LBN_SELCHANGE));
+      }
       break;
    }
 
@@ -2242,34 +2246,34 @@ TreeControlWndProc(
 #define fDontSelChange  HIWORD(wParam)
 #define szDir           (LPTSTR)lParam  // NULL -> default == window text.
 
-	   //
-	   // Don't do anything while the tree is being built.
-	   //
-	   if (GetWindowLongPtr(hwnd, GWL_READLEVEL))
-		   break;
+      //
+      // Don't do anything while the tree is being built.
+      //
+      if (GetWindowLongPtr(hwnd, GWL_READLEVEL))
+         break;
 
-	   RECT rc;
-	   DWORD i;
-	   PDNODE    pNode;
+      RECT rc;
+      DWORD i;
+      PDNODE    pNode;
 
-	   // do the same as TC_SETDIRECTORY above for the simple case
-	   if (FindItemFromPath(hwndLB, (LPTSTR)lParam, 0, &i, &pNode))
-	   {
-		   // found exact node already displayed; select it and continue
-		   SendMessage(hwndLB, LB_SETCURSEL, i, 0L);
+      // do the same as TC_SETDIRECTORY above for the simple case
+      if (FindItemFromPath(hwndLB, (LPTSTR)lParam, 0, &i, &pNode))
+      {
+         // found exact node already displayed; select it and continue
+         SendMessage(hwndLB, LB_SETCURSEL, i, 0L);
 
-		   goto UpdateDirSelection;
-	   }
+         goto UpdateDirSelection;
+      }
 
-	   if (!fFullyExpand && pNode)
-	   {
-		   // expand in place if pNode != null; index (i) also set
-		   FillOutTreeList(hwnd, szDir, i, pNode);
+      if (!fFullyExpand && pNode)
+      {
+         // expand in place if pNode != null; index (i) also set
+         FillOutTreeList(hwnd, szDir, i, pNode);
 
-		   goto UpdateDirSelection;
-	   }
+         goto UpdateDirSelection;
+      }
 
-	  // else change drive (existing code)
+      // else change drive (existing code)
 
       //
       // is the drive/dir specified?
@@ -2283,7 +2287,7 @@ TreeControlWndProc(
                      (LPARAM)szPath);
          StripBackslash(szPath);
       }
-	  
+
       CharUpperBuff(szPath, 1);     // make sure
 
       SetWindowLongPtr(hwndParent, GWL_TYPE, szPath[0] - TEXT('A'));
@@ -2353,7 +2357,7 @@ TreeControlWndProc(
          cchMatch = wcslen(rgchMatch);
          if (cchMatch > wcslen(pNode->szName))
                 cchMatch = wcslen(pNode->szName);
-         if (CompareString( LOCALE_USER_DEFAULT, NORM_IGNORECASE, 
+         if (CompareString( LOCALE_USER_DEFAULT, NORM_IGNORECASE,
              rgchMatch, (INT)cchMatch, pNode->szName, (INT)cchMatch) == 2)
             break;
 
@@ -2378,7 +2382,7 @@ TreeControlWndProc(
       }
       {
       IDropTarget *pDropTarget;
-      
+
       pDropTarget = (IDropTarget *)GetWindowLongPtr(hwnd, GWL_OLEDROP);
       if (pDropTarget != NULL)
         UnregisterDropWindow(hwnd, pDropTarget);
@@ -2408,7 +2412,7 @@ TreeControlWndProc(
 
         {
       WF_IDropTarget *pDropTarget;
-      
+
       RegisterDropWindow(hwnd, &pDropTarget);
       SetWindowLongPtr(hwnd, GWL_OLEDROP, (LPARAM)pDropTarget);
       }
@@ -2423,22 +2427,41 @@ TreeControlWndProc(
    {
       PDNODE pNodePrev;
       PDNODE pNodeT;
+      DWORD  dwFSCOperation;
+      BOOLEAN bCreationOperation;
+      BOOLEAN bUpdateTree;
 
-      if (!lParam || wParam == FSC_REFRESH)
-         break;
+      dwFSCOperation = FSC_Operation(wParam);
+      bCreationOperation = FALSE;
 
-	  /* Did we find it? */
-	  if (!FindItemFromPath(hwndLB, (LPTSTR)lParam,
-		  wParam == FSC_MKDIR || wParam == FSC_MKDIRQUIET, (DWORD*)&nIndex, &pNode)) {
+      if (!lParam || dwFSCOperation == FSC_REFRESH) {
          break;
-	  }
+      }
+
+      if (dwFSCOperation == FSC_MKDIR ||
+          dwFSCOperation == FSC_JUNCTION ||
+          dwFSCOperation == FSC_SYMLINKD) {
+
+         bCreationOperation = TRUE;
+      }
+
+      //
+      // search for a tree node corresponding to the item (if it is being
+      // removed), or to the item's parent (if it is being added.)  If an
+      // item is not found, there is no further processing to perform.
+      //
+      if (!FindItemFromPath(hwndLB, (LPTSTR)lParam,
+          bCreationOperation, (DWORD*)&nIndex, &pNode)) {
+         break;
+      }
 
       lstrcpy(szPath, (LPTSTR)lParam);
       StripPath(szPath);
 
-      switch (wParam) {
+      switch (dwFSCOperation) {
       case FSC_MKDIR:
-      case FSC_MKDIRQUIET:
+      case FSC_JUNCTION:
+      case FSC_SYMLINKD:
 
          //
          // auto expand the branch so they can see the new
@@ -2446,50 +2469,66 @@ TreeControlWndProc(
          //
          if (!(pNode->wFlags & TF_EXPANDED) &&
             (nIndex == (INT)SendMessage(hwndLB, LB_GETCURSEL, 0, 0L)) &&
-            FSC_MKDIRQUIET != wParam)
+            ((wParam & FSC_QUIET) == 0)) {
 
             SendMessage(hwnd, TC_EXPANDLEVEL, FALSE, 0L);
+         }
 
          //
          // make sure this node isn't already here
          //
-         if (FindItemFromPath(hwndLB, (LPTSTR)lParam, FALSE, NULL, NULL))
+         if (FindItemFromPath(hwndLB, (LPTSTR)lParam, FALSE, NULL, NULL)) {
             break;
+         }
 
          //
-         // Insert it into the tree listbox
+         // If FSC_JUNCTION, check if junctions should be displayed
          //
-         dwTemp = InsertDirectory( hwnd,
-                                   pNode,
-                                   (WORD)nIndex,
-                                   szPath,
-                                   &pNodeT,
-                                   IsCasePreservedDrive(DRIVEID(((LPTSTR)lParam))),
-                                   FALSE,
-                                   (DWORD)(-1) );
+         bUpdateTree = TRUE;
+         if (dwFSCOperation == FSC_JUNCTION) {
+            DWORD dwAttribsToInclude;
+            dwAttribsToInclude = (DWORD)GetWindowLongPtr(GetParent(hwnd), GWL_ATTRIBS);
+            if ((dwAttribsToInclude & ATTR_JUNCTION) == 0) {
+               bUpdateTree = FALSE;
+            }
+         }
 
-         //
-         // Add a plus if necessary
-         //
-         if (GetWindowLongPtr(hwndParent, GWL_VIEW) & VIEW_PLUSES) {
-
-            lstrcpy(szPath, (LPTSTR)lParam);
-            ScanDirLevel( (PDNODE)pNodeT,
-                          szPath,
-                          (GetWindowLongPtr(hwndParent, GWL_ATTRIBS) & (ATTR_HS | ATTR_JUNCTION)));
+         if (bUpdateTree) {
 
             //
-            // Invalidate the window so the plus gets drawn if needed
+            // Insert it into the tree listbox
             //
-            if (((PDNODE)pNodeT)->wFlags & TF_HASCHILDREN) {
-               InvalidateRect(hwndLB, NULL, FALSE);
+            InsertDirectory( hwnd,
+                             pNode,
+                             (WORD)nIndex,
+                             szPath,
+                             &pNodeT,
+                             IsCasePreservedDrive(DRIVEID(((LPTSTR)lParam))),
+                             FALSE,
+                             INVALID_FILE_ATTRIBUTES );
+
+            //
+            // Add a plus if necessary
+            //
+            if (GetWindowLongPtr(hwndParent, GWL_VIEW) & VIEW_PLUSES) {
+
+               lstrcpy(szPath, (LPTSTR)lParam);
+               ScanDirLevel( (PDNODE)pNodeT,
+                             szPath,
+                             (GetWindowLongPtr(hwndParent, GWL_ATTRIBS) & (ATTR_HS | ATTR_JUNCTION)));
+
+               //
+               // Invalidate the window so the plus gets drawn if needed
+               //
+               if (((PDNODE)pNodeT)->wFlags & TF_HASCHILDREN) {
+                  InvalidateRect(hwndLB, NULL, FALSE);
+               }
             }
          }
 
          break;
 
       case FSC_RMDIR:
-      case FSC_RMDIRQUIET:
 
          //
          // Don't do anything while the tree is being built.
@@ -2557,7 +2596,7 @@ TreeControlWndProc(
                // In the quiet case, don't change selection.
                // FSC_RENAME will handle this for us.
                //
-               if (FSC_RMDIRQUIET != wParam) {
+               if ((wParam & FSC_QUIET) == 0) {
                   SendMessage(hwndLB, LB_SETCURSEL, nIndex - 1, 0L);
                   SendMessage(hwnd, WM_COMMAND, GET_WM_COMMAND_MPS(0, hwndLB, LBN_SELCHANGE));
                }
@@ -2623,7 +2662,7 @@ TreeControlWndProc(
             SendMessage(hwndDir, FS_CHANGEDISPLAY, id, (LPARAM)szPath);
 
          } else {
-			 // TODO: why isn't this part of TC_SETDRIVE?  currently when a tree only is shown, the MDI window text is not updated
+            // TODO: why isn't this part of TC_SETDRIVE?  currently when a tree only is shown, the MDI window text is not updated
             SetMDIWindowText(hwndParent, szPath);
          }
 
@@ -2669,8 +2708,8 @@ UpdateSelection:
    }
 
    case WM_CONTEXTMENU:
-	   ActivateCommonContextMenu(hwnd, hwndLB, lParam);
-	   break;
+      ActivateCommonContextMenu(hwnd, hwndLB, lParam);
+      break;
 
    case WM_LBTRACKPOINT:
    {
@@ -2903,7 +2942,7 @@ UpdateSelection:
                }
             }
          }
-         else if (GetKeyState(VK_MENU) < 0 || GetKeyState(VK_SHIFT) < 0) 
+         else if (GetKeyState(VK_MENU) < 0 || GetKeyState(VK_SHIFT) < 0)
             // ALT || SHIFT forces a move even if not on same drive
             iOperation = DROP_MOVE;
             else

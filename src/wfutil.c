@@ -20,43 +20,43 @@ LPTSTR CurDirCache[26];
 DWORD historyCur = 0;
 typedef struct HistoryDir
 {
-	HWND hwnd;
-	TCHAR szDir[MAXPATHLEN];
+    HWND hwnd;
+    TCHAR szDir[MAXPATHLEN];
 } HistoryDir;
 HistoryDir rghistoryDir[MAXHISTORY];
 
 VOID
 SaveHistoryDir(HWND hwnd, LPWSTR szDir)
 {
-	if (rghistoryDir[historyCur].hwnd == hwnd && lstrcmpi(rghistoryDir[historyCur].szDir, szDir) == 0)
-		return;
+    if (rghistoryDir[historyCur].hwnd == hwnd && lstrcmpi(rghistoryDir[historyCur].szDir, szDir) == 0)
+        return;
 
-	historyCur = (historyCur + 1) % MAXHISTORY;
+    historyCur = (historyCur + 1) % MAXHISTORY;
 
-	rghistoryDir[historyCur].hwnd = hwnd;
-	lstrcpy(rghistoryDir[historyCur].szDir, szDir);
+    rghistoryDir[historyCur].hwnd = hwnd;
+    lstrcpy(rghistoryDir[historyCur].szDir, szDir);
 
-	// always leave one NULL entry after current
-	DWORD historyT = (historyCur + 1) % MAXHISTORY;
-	rghistoryDir[historyT].hwnd = NULL;
-	rghistoryDir[historyT].szDir[0] = '\0';
+    // always leave one NULL entry after current
+    DWORD historyT = (historyCur + 1) % MAXHISTORY;
+    rghistoryDir[historyT].hwnd = NULL;
+    rghistoryDir[historyT].szDir[0] = '\0';
 }
 
 BOOL
 GetPrevHistoryDir(BOOL forward, HWND *phwnd, LPWSTR szDir)
 {
-	DWORD historyNext = (historyCur + 1) % MAXHISTORY;
-	DWORD historyPrev = (historyCur == 0 ? MAXHISTORY : historyCur )- 1;
-	DWORD historyT = forward ? historyNext : historyPrev;
+    DWORD historyNext = (historyCur + 1) % MAXHISTORY;
+    DWORD historyPrev = (historyCur == 0 ? MAXHISTORY : historyCur )- 1;
+    DWORD historyT = forward ? historyNext : historyPrev;
 
-	if (rghistoryDir[historyT].hwnd == NULL)
-		return FALSE;
-	
-	historyCur = historyT;
+    if (rghistoryDir[historyT].hwnd == NULL)
+        return FALSE;
 
-	*phwnd = rghistoryDir[historyCur].hwnd;  
-	lstrcpy(szDir, rghistoryDir[historyCur].szDir);
-	return TRUE;
+    historyCur = historyT;
+
+    *phwnd = rghistoryDir[historyCur].hwnd;  
+    lstrcpy(szDir, rghistoryDir[historyCur].szDir);
+    return TRUE;
 }
 
 LPWSTR
@@ -209,7 +209,7 @@ GetSelectedDirectory(DRIVE drive, LPTSTR pszDir)
              goto hwndfound;
        }
        if (!GetSavedDirectory(drive - 1, pszDir)) {
-	    GetDriveDirectory(drive, pszDir);
+          GetDriveDirectory(drive, pszDir);
        }
        return;
     } else
@@ -227,8 +227,8 @@ BOOL  GetDriveDirectory(INT iDrive, LPTSTR pszDir)
     TCHAR drvstr[4];
     DWORD ret;
 
-	pszDir[0] = '\0';
-	
+    pszDir[0] = '\0';
+
     if(iDrive!=0)
     {
         drvstr[0] = ('A') - 1 + iDrive;
@@ -242,15 +242,15 @@ BOOL  GetDriveDirectory(INT iDrive, LPTSTR pszDir)
         drvstr[1] = ('\0');
     }
 
-	if (GetFileAttributes(drvstr) == INVALID_FILE_ATTRIBUTES)
-		return FALSE;
+    if (GetFileAttributes(drvstr) == INVALID_FILE_ATTRIBUTES)
+        return FALSE;
 
-//	if (!CheckDirExists(drvstr))
-//		return FALSE;
+//  if (!CheckDirExists(drvstr))
+//      return FALSE;
 
     ret = GetFullPathName( drvstr, MAXPATHLEN, pszDir, NULL);
 
-	return ret != 0;
+    return ret != 0;
 }
 
 
@@ -259,42 +259,42 @@ BOOL  GetDriveDirectory(INT iDrive, LPTSTR pszDir)
 VOID
 GetAllDirectories(LPTSTR rgszDirs[])
 {
-	HWND mpdrivehwnd[MAX_DRIVES];
+    HWND mpdrivehwnd[MAX_DRIVES];
     HWND hwnd;
     DRIVE driveT;
 
-	for (driveT = 0; driveT < MAX_DRIVES; driveT++)
-	{
-		rgszDirs[driveT] = NULL;
-		mpdrivehwnd[driveT] = NULL;
-	}
-		
+    for (driveT = 0; driveT < MAX_DRIVES; driveT++)
+    {
+        rgszDirs[driveT] = NULL;
+        mpdrivehwnd[driveT] = NULL;
+    }
+
     for (hwnd = GetWindow(hwndMDIClient,GW_CHILD); hwnd; hwnd = GetWindow(hwnd,GW_HWNDNEXT)) 
     {
-    	driveT = (DRIVE)SendMessage(hwnd,FS_GETDRIVE,0,0L) - CHAR_A;
-    	if (mpdrivehwnd[driveT] == NULL)
-			mpdrivehwnd[driveT] = hwnd;    	
-	}
+        driveT = (DRIVE)SendMessage(hwnd,FS_GETDRIVE,0,0L) - CHAR_A;
+        if (mpdrivehwnd[driveT] == NULL)
+            mpdrivehwnd[driveT] = hwnd;
+    }
 
-	for (driveT = 0; driveT < MAX_DRIVES; driveT++)
-	{
-		TCHAR szDir[MAXPATHLEN];
-		
-		if (mpdrivehwnd[driveT] != NULL)
-		{
-		    SendMessage(mpdrivehwnd[driveT],FS_GETDIRECTORY,MAXPATHLEN,(LPARAM)szDir);
+    for (driveT = 0; driveT < MAX_DRIVES; driveT++)
+    {
+        TCHAR szDir[MAXPATHLEN];
 
-		    StripBackslash(szDir);
-		}
-		else if (!GetSavedDirectory(driveT, szDir))
-			szDir[0] = '\0';
+        if (mpdrivehwnd[driveT] != NULL)
+        {
+            SendMessage(mpdrivehwnd[driveT],FS_GETDIRECTORY,MAXPATHLEN,(LPARAM)szDir);
 
-		if (szDir[0] != '\0')
-		{
-			rgszDirs[driveT] = (LPTSTR) LocalAlloc(LPTR, ByteCountOf(lstrlen(szDir)+1));		
-			lstrcpy(rgszDirs[driveT], szDir);
-		}
-	}
+            StripBackslash(szDir);
+        }
+        else if (!GetSavedDirectory(driveT, szDir))
+            szDir[0] = '\0';
+
+        if (szDir[0] != '\0')
+        {
+            rgszDirs[driveT] = (LPTSTR) LocalAlloc(LPTR, ByteCountOf(lstrlen(szDir)+1));
+            lstrcpy(rgszDirs[driveT], szDir);
+        }
+    }
 }
 
 
@@ -317,8 +317,6 @@ RefreshWindow(
    BOOL bFlushCache)
 {
    HWND hwndTree, hwndDir;
-   LPARAM lParam;
-   TCHAR szDir[MAXPATHLEN];
    DRIVE drive;
 
    //
@@ -334,38 +332,32 @@ RefreshWindow(
    //
    drive = (DRIVE)GetWindowLongPtr(hwndActive, GWL_TYPE);
 
-   if ((drive >= 0) && !CheckDrive(hwndActive, drive, FUNC_SETDRIVE))
+   if ((drive >= 0) && !CheckDrive(hwndActive, drive, FUNC_SETDRIVE)) {
       return;
+   }
 
    //
    // If bFlushCache, remind ourselves to try it
    //
-   if (bFlushCache)
+   if (bFlushCache) {
       aDriveInfo[drive].bShareChkTried = FALSE;
+   }
 
    // NOTE: similar to CreateDirWindow
 
    //
    // update the dir part first so tree can steal later
    //
-   if (hwndDir = HasDirWindow(hwndActive))
+   if (hwndDir = HasDirWindow(hwndActive)) {
       SendMessage(hwndDir, FS_CHANGEDISPLAY, CD_PATH, 0L);
+   }
 
    if (hwndTree = HasTreeWindow(hwndActive)) {
-      //
-      // remember the current directory
-      //
-      SendMessage(hwndActive, FS_GETDIRECTORY, COUNTOF(szDir), (LPARAM)szDir);
 
       //
       // update the drives windows
       //
       SendMessage(hwndActive, FS_CHANGEDRIVES, 0, 0L);
-
-      if (IsValidDisk(DRIVEID(szDir)))
-         lParam = (LPARAM)szDir;
-      else
-         lParam = 0L;
 
       //
       // update the tree
@@ -373,11 +365,12 @@ RefreshWindow(
       SendMessage(hwndTree,
                   TC_SETDRIVE,
                   MAKELONG(MAKEWORD(FALSE,TRUE),TRUE),
-                  lParam);
+                  0L);
    }
 
-   if (hwndActive == hwndSearch)
+   if (hwndActive == hwndSearch) {
       SendMessage(hwndActive, FS_CHANGEDISPLAY, CD_PATH, 0L);
+   }
 }
 
 //
@@ -843,7 +836,7 @@ IsNetDrive(INT drive)
 #endif
 
 BOOL
-IsNTFSDrive(register DRIVE drive)
+IsNTFSDrive(DRIVE drive)
 {
    U_VolInfo(drive);
 
@@ -868,7 +861,7 @@ IsNTFSDrive(register DRIVE drive)
 //            If it is NOT a FAT drive, it returns TRUE.
 //
 BOOL
-IsCasePreservedDrive(register DRIVE drive)
+IsCasePreservedDrive(DRIVE drive)
 {
    U_VolInfo(drive);
 
@@ -896,14 +889,14 @@ IsCasePreservedDrive(register DRIVE drive)
 
 
 BOOL
-IsRemovableDrive(register DRIVE drive)
+IsRemovableDrive(DRIVE drive)
 {
    return aDriveInfo[drive].uType == DRIVE_REMOVABLE;
 }
 
 
 BOOL
-IsRemoteDrive(register DRIVE drive)
+IsRemoteDrive(DRIVE drive)
 {
    return aDriveInfo[drive].uType == DRIVE_REMOTE;
 }
@@ -1244,7 +1237,7 @@ CheckSlashes(LPTSTR lpT)
 UINT
 AddBackslash(LPTSTR lpszPath)
 {
-   register UINT uLen = lstrlen(lpszPath);
+   UINT uLen = lstrlen(lpszPath);
 
    if (*(lpszPath+uLen-1) != CHAR_BACKSLASH) {
 
@@ -1269,7 +1262,7 @@ AddBackslash(LPTSTR lpszPath)
 VOID
 StripBackslash(LPTSTR lpszPath)
 {
-  register UINT len;
+  UINT len;
 
   len = (lstrlen(lpszPath) - 1);
   if ((len == 2) || (lpszPath[len] != CHAR_BACKSLASH))
@@ -1616,4 +1609,112 @@ BOOL TypeAheadString(WCHAR ch, LPWSTR szT)
    lstrcpy(szT, rgchTA);
 
    return ich != 0;
+}
+
+// RegGetValue isn't available on Windows XP
+LONG WFRegGetValueW(HKEY hkey, LPCWSTR lpSubKey, LPCWSTR lpValue, DWORD dwFlags, LPDWORD pdwType, PVOID pvData, LPDWORD pcbData)
+{
+    DWORD dwStatus;
+    DWORD dwLocalType;
+    DWORD dwOriginalSize;
+    DWORD dwLocalSize;
+    HKEY hkeySub;
+    DWORD dwAllowMask;
+    BOOLEAN bTerminated;
+
+
+    if ((dwStatus = RegOpenKey(hkey, lpSubKey, &hkeySub)) == ERROR_SUCCESS)
+    {
+        dwOriginalSize = 0;
+        if (pcbData != NULL)
+        {
+            dwOriginalSize = *pcbData;
+        }
+
+        dwStatus = RegQueryValueEx(hkeySub, lpValue, NULL, &dwLocalType, pvData, &dwLocalSize);
+        if (dwStatus != ERROR_SUCCESS)
+        {
+            return dwStatus;
+        }
+
+        dwAllowMask = 0;
+        switch(dwLocalType)
+        {
+            case REG_SZ:
+                dwAllowMask = RRF_RT_REG_SZ;
+                break;
+            case REG_EXPAND_SZ:
+                dwAllowMask = RRF_RT_REG_EXPAND_SZ;
+                break;
+            case REG_BINARY:
+                dwAllowMask = RRF_RT_REG_BINARY;
+                break;
+            case REG_DWORD:
+                dwAllowMask = RRF_RT_REG_DWORD;
+                break;
+            case REG_MULTI_SZ:
+                dwAllowMask = RRF_RT_REG_MULTI_SZ;
+                break;
+        }
+
+        if ((dwAllowMask & dwFlags) == 0)
+        {
+            return ERROR_INVALID_DATA;
+        }
+
+        //
+        //  RegGetValue promises to NULL terminate strings.  Look to see if
+        //  we have a string without a NULL terminator.  If so, see if there's
+        //  space to add one; if no space, fail.
+        //
+
+        if (dwLocalType == REG_SZ || dwLocalType == REG_EXPAND_SZ || dwLocalType == REG_MULTI_SZ)
+        {
+            WCHAR * wszData;
+
+            wszData = pvData;
+            bTerminated = FALSE;
+
+            //
+            //  Not an even number of WCHARs, not a valid string
+            //
+
+            if (dwLocalSize & 0x1)
+            {
+                return ERROR_INVALID_DATA;
+            }
+
+            if (dwLocalSize > 0 && wszData[dwLocalSize / 2 - 1] == '\0')
+            {
+                bTerminated = TRUE;
+            }
+
+            if (!bTerminated)
+            {
+                if (dwOriginalSize > dwLocalSize)
+                {
+                    wszData[dwLocalSize / 2] = '\0';
+                    dwLocalSize = dwLocalSize + sizeof(WCHAR);
+                }
+                else
+                {
+                    dwLocalSize = dwLocalSize + sizeof(WCHAR);
+                    *pcbData = dwLocalSize;
+                    return ERROR_MORE_DATA;
+                }
+            }
+        }
+
+        if (pcbData != NULL) {
+            *pcbData = dwLocalSize;
+        }
+
+        if (pdwType != NULL) {
+            *pdwType = dwLocalType;
+        }
+
+        RegCloseKey(hkeySub);
+    }
+
+    return dwStatus;
 }

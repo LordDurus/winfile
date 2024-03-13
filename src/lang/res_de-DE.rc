@@ -9,7 +9,7 @@
 
 LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
 
-FRAMEMENU MENU PRELOAD
+FRAMEMENU MENU
 BEGIN
     POPUP       "&Datei"
     BEGIN
@@ -19,8 +19,8 @@ BEGIN
     MENUITEM    "&Kopieren...\tF8",                               IDM_COPY
     MENUITEM    "S&ymlink...\tF11",                               IDM_SYMLINK
     MENUITEM    "H&ardlink...\tUmschalt+F11",                     IDM_HARDLINK
-    MENUITEM    "&In Zwischenablage...\tStrg+C",				  IDM_COPYTOCLIPBOARD
-    MENUITEM    "Ausschneiden in Zwischenablage...\tStrg+X",	  IDM_CUTTOCLIPBOARD
+    MENUITEM    "&In Zwischenablage...\tStrg+C",                  IDM_COPYTOCLIPBOARD
+    MENUITEM    "Ausschneiden in Zwischenablage...\tStrg+X",      IDM_CUTTOCLIPBOARD
     MENUITEM    "&Einfügen\tStrg+V",                              IDM_PASTE
     MENUITEM    "&Löschen...\tEntf",                              IDM_DELETE
     MENUITEM    "&Umbenennen...\tF2",                             IDM_RENAME
@@ -33,12 +33,16 @@ BEGIN
     MENUITEM    "&Drucken...",                                    IDM_PRINT
     MENUITEM    "Zuord&nen...",                                   IDM_ASSOCIATE
     MENUITEM    SEPARATOR
-    MENUITEM    "Ver&zeichnis erstellen...\tUmschalt+Strg+N",              IDM_MAKEDIR
+    MENUITEM    "Ver&zeichnis erstellen...\tUmschalt+Strg+N",     IDM_MAKEDIR
     MENUITEM    "&Suchen...\tStrg+F",                             IDM_SEARCH
     MENUITEM    "Dateien aus&wählen...",                          IDM_SELECT
-    MENUITEM    "Starte Bash Shell...\tStrg+B",                   IDM_STARTBASHSHELL
-    MENUITEM    "Starte Cmd Shel&l...\tStrg+K",                   IDM_STARTCMDSHELL
-    MENUITEM    "Starte Po&werShell...\tStrg+P",                  IDM_STARTPOWERSHELL
+    POPUP       "Starte (&.)"
+    BEGIN
+    MENUITEM    "&Bash Shell...\tStrg+B",                         IDM_STARTBASHSHELL
+    MENUITEM    "&Cmd Shell...\tStrg+K",                          IDM_STARTCMDSHELL
+    MENUITEM    "&PowerShell...\tStrg+P",                         IDM_STARTPOWERSHELL
+    MENUITEM    "&Explorer...\tStrg+E",                           IDM_STARTEXPLORER
+    END
     MENUITEM    "&Gehe ins Verzeichnis...\tStrg+G",               IDM_GOTODIR
     MENUITEM    SEPARATOR
     MENUITEM    "&Beenden",                                       IDM_EXIT
@@ -125,20 +129,20 @@ BEGIN
     END
 END
 
-CTXMENU MENU PRELOAD 
+CTXMENU MENU
 BEGIN
   POPUP "Dummy Popup"
   BEGIN
-  MENUITEM    "&Neues Fenster\tStrg+Umschalt Eingabetaste",      IDM_NEWWINDOW
-  MENUITEM    "Öffnen\tEnter",                                   IDM_OPEN
-  MENUITEM    "Bearbeiten\tF12",	                                IDM_EDIT
+  MENUITEM    "&Neues Fenster\tStrg+Umschalt Eingabetaste",       IDM_NEWWINDOW
+  MENUITEM    "Öffnen\tEnter",                                    IDM_OPEN
+  MENUITEM    "Bearbeiten\tF12",                                  IDM_EDIT
   MENUITEM    "&Verschieben...\tF7",                              IDM_MOVE
   MENUITEM    "&Kopieren...\tF8",                                 IDM_COPY
   MENUITEM    "S&ymlinken...\tF11",                               IDM_SYMLINK
   MENUITEM    "H&ardlinken...\tUmschalt+F11",                     IDM_HARDLINK
-  MENUITEM    "&In Zwischenablage...\tStrg+C",                IDM_COPYTOCLIPBOARD
-  MENUITEM    "Ausschneiden in Zwischenablage...\tStrg+X",    IDM_CUTTOCLIPBOARD
-  MENUITEM    "&Einfügen\tStrg+V",                            IDM_PASTE
+  MENUITEM    "&In Zwischenablage...\tStrg+C",                    IDM_COPYTOCLIPBOARD
+  MENUITEM    "Ausschneiden in Zwischenablage...\tStrg+X",        IDM_CUTTOCLIPBOARD
+  MENUITEM    "&Einfügen\tStrg+V",                                IDM_PASTE
   MENUITEM    "&Löschen...\tEntf",                                IDM_DELETE
   MENUITEM    "&Umbenennen...\tF2",                               IDM_RENAME
   MENUITEM    "&Eigenschaften...\tAlt+Eingabetaste",              IDM_ATTRIBS
@@ -146,13 +150,14 @@ BEGIN
   MENUITEM    "Starte Bash Shell...",                             IDM_STARTBASHSHELL
   MENUITEM    "Starte Cmd She&ll...",                             IDM_STARTCMDSHELL
   MENUITEM    "Starte Po&werShell...",                            IDM_STARTPOWERSHELL
+  MENUITEM    "Starte E&xplorer...",                              IDM_STARTEXPLORER
   MENUITEM    "&Gehe ins Verzeichnis...",                         IDM_GOTODIR
   END
 END
 
 #define SUGGEST(id,err,flags,str) id+IDS_SUGGESTBEGIN str
 /*              0....5....1....56...2....5....3.2..5....4....5....5....6....5....7....5....8....5....9....5....0....5....1....5....2....5..8 */
-STRINGTABLE DISCARDABLE PRELOAD
+STRINGTABLE
 BEGIN
 //    IDS_ENDSESSION          "Exit Windows"                                                          /* 32 */
 //    IDS_ENDSESSIONMSG       "This will end your Windows session."                                   /* 128 */
@@ -244,6 +249,7 @@ BEGIN
     IDS_PRINTONLYONE        "Datei-Manager kann nicht mehrere Dateien drucken.\n\nWählen Sie eine Datei aus und versuchen Sie es erneut."                                               /* 128 */
 
     IDS_CURDIRIS,           "Aktuelles Verzeichnis: %s"                                                                                                    /* 128 */
+    IDS_CURDIRSARE,         "Other: "
     IDS_COPY,               "Kopieren"                          /* 32 */
     IDS_RENAME,             "Umbenennen"                        /* 32 */
     IDS_FORMAT,             "Datenträger formatieren"                   /* 32 */
@@ -251,16 +257,14 @@ BEGIN
     IDS_SYMLINK,            "Symlinken"                       /* 32 */
     IDS_HARDLINK,           "Hardlinken"                      /* 32 */
 
-JAPANBEGIN
-    IDS_KK_COPYFROMSTR,     "コピー元(&F):"
-    IDS_KK_COPYTOSTR,       "コピー先(&T):"
-    IDS_KK_RENAMEFROMSTR,   "元の名前(&F):"
-    IDS_KK_RENAMETOSTR,     "新しい名前(&T):"
-    IDS_KK_HARDLINKFROMSTR, "ハードリンク元(&F):"
-    IDS_KK_HARDLINKTOSTR,   "ハードリンク先(&T):"
-    IDS_KK_SYMLINKFROMSTR,  "シンボリックリンク元(&F):"
-    IDS_KK_SYMLINKTOSTR,    "シンボリックリンク先(&T):"
-  JAPANEND
+    IDS_KK_COPYFROMSTR,     "&Von:"
+    IDS_KK_COPYTOSTR,       "&Nach:"
+    IDS_KK_RENAMEFROMSTR,   "&Von:"
+    IDS_KK_RENAMETOSTR,     "&Nach:"
+    IDS_KK_HARDLINKFROMSTR, "&Von:"
+    IDS_KK_HARDLINKTOSTR,   "&Nach:"
+    IDS_KK_SYMLINKFROMSTR,  "&Von:"
+    IDS_KK_SYMLINKTOSTR,    "&Nach:"
 
 //    IDS_MAKESYSDISK,      "Erstelle Systemdatenträger"  /* 32 */
 
@@ -328,16 +332,11 @@ JAPANBEGIN
 
     IDS_COPYINGTITLE            "Kopiere..."
 
-JAPANBEGIN
-    IDS_KK_COPY                 "コピー先:"
-JAPANEND
-
     IDS_QUICKFORMATTINGTITLE    "Schnell-Formatierung..."
 
     IDS_BUSYFORMATQUITVERIFY    "Momentan wird ein Datenträger vom Datei-Manager formatiert. Wenn Sie den Datei-Manager beenden, wird dieser Vorgang abgebrochen."
     IDS_BUSYCOPYQUITVERIFY      "Momentan wird ein Datenträger vom Datei-Manager kopiert. Wenn Sie den Datei-Manager beenden, wird dieser Vorgang abgebrochen."
     IDS_PERCENTCOMPLETE         "Prozent bearbeitet"
-    IDS_FORMATSELECTDLGTITLE    "Formatiere Laufwerk"
 
     IDS_12MB                    "1%s2 MB"
     IDS_360KB                   "360K"
@@ -526,7 +525,7 @@ END
 
 /* Help strings for the popup menus.
  */
-STRINGTABLE LOADONCALL MOVEABLE DISCARDABLE
+STRINGTABLE
 BEGIN
     MH_POPUP+IDM_FILE,          "Befehle zum Arbeiten mit Dateien"
     MH_POPUP+IDM_DISK,          "Befehle zum Arbeiten mit Datenträgern"
@@ -541,14 +540,14 @@ END
 
 // Help strings for the "standard" toolbar items.
 
-STRINGTABLE LOADONCALL MOVEABLE DISCARDABLE
+STRINGTABLE
 BEGIN
     MH_MYITEMS+IDM_OPEN,            "Ausgewähltes Objekt öffnen"
     MH_MYITEMS+IDM_EDIT,            "Bearbeiten des ausgewählten Elements mit Notepad.exe"
     MH_MYITEMS+IDM_MOVE,            "Verschieben des ausgewählten Objekts"
     MH_MYITEMS+IDM_COPY,            "Kopieren von Dateien und Verzeichnissen"
     MH_MYITEMS+IDM_COPYTOCLIPBOARD, "Kopieren einer Datei in die Zwischenablage"
-	MH_MYITEMS+IDM_CUTTOCLIPBOARD,  "Schneidet eine oder mehrere Dateien in die Zwischenablage aus"
+    MH_MYITEMS+IDM_CUTTOCLIPBOARD,  "Schneidet eine oder mehrere Dateien in die Zwischenablage aus"
     MH_MYITEMS+IDM_PASTE,           "Datei aus der Zwischenablage in das aktuelle Verzeichnis einfügen"
     MH_MYITEMS+IDM_COMPRESS,        "Komprimieren einer Datei oder eines Verzeichnisses"
     MH_MYITEMS+IDM_UNCOMPRESS,      "Dekomprimieren einer Datei oder eines Verzeichnisses"
@@ -630,7 +629,7 @@ END
 
 // Strings for menu items that may be added at init time.
 
-STRINGTABLE MOVEABLE DISCARDABLE
+STRINGTABLE
 BEGIN
     IDS_CONNECT,                "Netzlaufwerk &verbinden...\tStrg+N"
     IDS_DISCONNECT,             "Netzlaufwerk &trennen...\tStrg+D"

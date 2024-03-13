@@ -9,19 +9,19 @@
 
 LANGUAGE LANG_JAPANESE, SUBLANG_JAPANESE_JAPAN
 
-FRAMEMENU MENU PRELOAD
+FRAMEMENU MENU
 BEGIN
     POPUP       "ファイル(&F)"
     BEGIN
     MENUITEM    "開く(&O)\tEnter",     IDM_OPEN
-    MENUITEM    "編集\tF12",	    IDM_EDIT
+    MENUITEM    "編集\tF12",        IDM_EDIT
     MENUITEM    "移動(&M)...\tF7",     IDM_MOVE
     MENUITEM    "コピー(&C)...\tF8",     IDM_COPY
-   MENUITEM    "シンボリックリンク(&Y)...\tF11", IDM_SYMLINK
-   MENUITEM    "ハードリンク(&K)...\tShift+F11", IDM_HARDLINK
+    MENUITEM    "シンボリックリンク(&Y)...\tF11", IDM_SYMLINK
+    MENUITEM    "ハードリンク(&K)...\tShift+F11", IDM_HARDLINK
     MENUITEM    "クリップボードにコピー(&B)...\tCtrl+C", IDM_COPYTOCLIPBOARD
-	MENUITEM    "クリップボードに切り取り\tCtrl+X", IDM_CUTTOCLIPBOARD
-    MENUITEM	"貼り付け(&P)\tCtrl+V", 	IDM_PASTE
+    MENUITEM    "クリップボードに切り取り\tCtrl+X", IDM_CUTTOCLIPBOARD
+    MENUITEM    "貼り付け(&P)\tCtrl+V",     IDM_PASTE
     MENUITEM    "削除(&D)...\tDel",  IDM_DELETE
     MENUITEM    "名前の変更(&N)...",   IDM_RENAME
     MENUITEM    "プロパティ(&T)...\tAlt+Enter",IDM_ATTRIBS
@@ -36,11 +36,14 @@ BEGIN
     MENUITEM    "ディレクトリを作成(&E)...\tCtrl+Shift+N", IDM_MAKEDIR
     MENUITEM    "検索(&C)...\tCtrl+F",       IDM_SEARCH
     MENUITEM    "ファイルを選択(&F)...", IDM_SELECT
-    MENUITEM    "Bash を起動...\tCtrl+B", IDM_STARTBASHSHELL
-    MENUITEM    "コマンド プロンプトを起動(&L)...\tCtrl+K", IDM_STARTCMDSHELL
-    MENUITEM    "PowerShell を起動(&W)...\tCtrl+P", IDM_STARTPOWERSHELL
-
-	MENUITEM    "別のディレクトリへ移動(&G)...\tCtrl+G", IDM_GOTODIR
+    POPUP       "を起動(&.)"
+    BEGIN
+    MENUITEM    "&Bash を起動...\tCtrl+B", IDM_STARTBASHSHELL
+    MENUITEM    "コマンド プロンプトを起動(&C)...\tCtrl+K", IDM_STARTCMDSHELL
+    MENUITEM    "&PowerShell を起動...\tCtrl+P", IDM_STARTPOWERSHELL
+    MENUITEM    "&Explorer を起動...\tCtrl+E", IDM_STARTEXPLORER
+    END
+    MENUITEM    "別のディレクトリへ移動(&G)...\tCtrl+G", IDM_GOTODIR
     MENUITEM    SEPARATOR
     MENUITEM    "終了(&X)",            IDM_EXIT
     END
@@ -87,9 +90,9 @@ BEGIN
     MENUITEM    "確認(&C)...",     IDM_CONFIRM
     MENUITEM    "フォント(&F)...",             IDM_FONT
     MENUITEM    "ツール バーのカスタマイズ(&B)...", IDM_TOOLBARCUST
-    MENUITEM    "追加の設定(&P)", IDM_PREF
-  MENUITEM    SEPARATOR
-  MENUITEM    "ツール バー(&T)",                 IDM_TOOLBAR
+    MENUITEM    "追加の設定(&P)...", IDM_PREF
+    MENUITEM    SEPARATOR
+    MENUITEM    "ツール バー(&T)",                  IDM_TOOLBAR
     MENUITEM    "ドライブ バー(&D)",                IDM_DRIVEBAR
     MENUITEM    "ステータス バー(&S)",              IDM_STATUSBAR
     MENUITEM    SEPARATOR
@@ -127,35 +130,36 @@ BEGIN
 
 END
 
-CTXMENU MENU PRELOAD
+CTXMENU MENU
 BEGIN
-	POPUP "Dummy Popup"
-	BEGIN
-	MENUITEM    "新しいウィンドウ(&N)\tCtrl+Shift Enter",     IDM_NEWWINDOW
+    POPUP "Dummy Popup"
+    BEGIN
+    MENUITEM    "新しいウィンドウ(&N)\tCtrl+Shift Enter",     IDM_NEWWINDOW
     MENUITEM    "開く(&O)\tEnter",     IDM_OPEN
-    MENUITEM    "編集\tF12",	    IDM_EDIT
+    MENUITEM    "編集\tF12",        IDM_EDIT
     MENUITEM    "移動(&M)...\tF7",     IDM_MOVE
     MENUITEM    "コピー(&C)...\tF8",     IDM_COPY
     MENUITEM    "シンボリックリンク(&Y)...\tF11",       IDM_SYMLINK
     MENUITEM    "ハードリンク(&K)...\tShift+F11", IDM_HARDLINK
-	MENUITEM    "クリップボードにコピー(&B)\tCtrl+C", IDM_COPYTOCLIPBOARD
-	MENUITEM    "クリップボードに切り取り\tCtrl+X", IDM_CUTTOCLIPBOARD
-	MENUITEM	"貼り付け(&P)\tCtrl+V", IDM_PASTE
-	MENUITEM    "削除(&D)...\tDel",  IDM_DELETE
+    MENUITEM    "クリップボードにコピー(&B)\tCtrl+C", IDM_COPYTOCLIPBOARD
+    MENUITEM    "クリップボードに切り取り\tCtrl+X", IDM_CUTTOCLIPBOARD
+    MENUITEM    "貼り付け(&P)\tCtrl+V", IDM_PASTE
+    MENUITEM    "削除(&D)...\tDel",  IDM_DELETE
     MENUITEM    "名前の変更(&N)...\tF2",   IDM_RENAME
     MENUITEM    "プロパティ(&T)...\tAlt+Enter",IDM_ATTRIBS
     MENUITEM    "実行(&R)...",          IDM_RUN
     MENUITEM    "Bash を起動...", IDM_STARTBASHSHELL
-	MENUITEM    "コマンド プロンプトを起動(&L)...", IDM_STARTCMDSHELL
-	MENUITEM    "PowerShell を起動(&W)...", IDM_STARTPOWERSHELL
-	MENUITEM    "別のディレクトリへ移動(&G)...", IDM_GOTODIR
-	END
+    MENUITEM    "コマンド プロンプトを起動(&L)...", IDM_STARTCMDSHELL
+    MENUITEM    "PowerShell を起動(&W)...", IDM_STARTPOWERSHELL
+    MENUITEM    "Explorer を起動(&X)...", IDM_STARTEXPLORER
+    MENUITEM    "別のディレクトリへ移動(&G)...", IDM_GOTODIR
+    END
 END
 
 
 #define SUGGEST(id,err,flags,str) id+IDS_SUGGESTBEGIN str
 /*              0....5....1....56...2....5....3.2..5....4....5....5....6....5....7....5....8....5....9....5....0....5....1....5....2....5..8 */
-STRINGTABLE DISCARDABLE PRELOAD
+STRINGTABLE
 BEGIN
 //    IDS_ENDSESSION          "Exit Windows"                  /* 32 */
 //    IDS_ENDSESSIONMSG       "This will end your Windows session."                                                                                      /* 128 */
@@ -196,7 +200,7 @@ BEGIN
 
     IDS_LABELDISKERR        "ファイル マネージャーはフロッピー ディスクにボリューム ラベルを付けられません。\n\nフロッピー ディスクが書き込み禁止になっていない事、ネットワーク ドライブではない事を確認して、正しい名前を入力して下さい。\n名前には次の文字を含めることはできません:\n[空白] * ? / \\ | . , ; : + = [ ] ( ) & ^ < > "" "
 
-	IDS_SEARCHNOMATCHES     "一致するファイルが見つかりませんでした。"
+    IDS_SEARCHNOMATCHES     "一致するファイルが見つかりませんでした。"
     IDS_SEARCHREFRESH       "このドライブの内容が変更されました。検索を再度実行しますか?"
     IDS_LABELACCESSDENIED   "この操作をハード ディスク上で実行するには、このワークステーションに管理者としてログインする必要があります。"
 
@@ -246,6 +250,7 @@ BEGIN
     IDS_PRINTONLYONE        "ファイル マネージャーは同時に複数のファイルを印刷する事はできません。\n\nファイルを1つだけ選択しもう一度試して下さい。"                                               /* 128 */
 
     IDS_CURDIRIS,           "現在のディレクトリ: %s"                                                                                                    /* 128 */
+    IDS_CURDIRSARE,         "Other: "
     IDS_COPY,               "コピー"                          /* 32 */
     IDS_RENAME,             "名前を変更"                        /* 32 */
     IDS_FORMAT,             "ディスクのフォーマット"                   /* 32 */
@@ -253,7 +258,6 @@ BEGIN
     IDS_SYMLINK,            "シンボリックリンク"                       /* 32 */
     IDS_HARDLINK,           "ハードリンク"                      /* 32 */
 
-JAPANBEGIN
     IDS_KK_COPYFROMSTR,     "コピー元(&F):"
     IDS_KK_COPYTOSTR,       "コピー先(&T):"
     IDS_KK_RENAMEFROMSTR,   "元の名前(&F):"
@@ -262,7 +266,6 @@ JAPANBEGIN
     IDS_KK_HARDLINKTOSTR,   "ハードリンク先(&T):"
     IDS_KK_SYMLINKFROMSTR,  "シンボリックリンク元(&F):"
     IDS_KK_SYMLINKTOSTR,    "シンボリックリンク先(&T):"
-  JAPANEND
 
 //    IDS_MAKESYSDISK,      "Make System Disk"              /* 32 */
 
@@ -330,16 +333,11 @@ JAPANBEGIN
 
     IDS_COPYINGTITLE            "コピー中..."
 
-JAPANBEGIN
-    IDS_KK_COPY                 "コピー先:"
-JAPANEND
-
     IDS_QUICKFORMATTINGTITLE    "クイック フォーマットを実行中..."
 
     IDS_BUSYFORMATQUITVERIFY    "現在ファイル マネージャーはフロッピー ディスクをフォーマットしています。ファイル マネージャーを終了すると、この操作が中断されます。"
     IDS_BUSYCOPYQUITVERIFY      "現在ファイル マネージャーはフロッピー ディスクをコピーしています。ファイル マネージャーを終了すると、この操作が中断されます。"
     IDS_PERCENTCOMPLETE         "完了の割合"
-    IDS_FORMATSELECTDLGTITLE    "ドライブのフォーマット"
 
     IDS_12MB                    "1%s2 MB"
     IDS_360KB                   "360K"
@@ -527,7 +525,7 @@ END
 
 /* Help strings for the popup menus.
  */
-STRINGTABLE LOADONCALL MOVEABLE DISCARDABLE
+STRINGTABLE
 BEGIN
     MH_POPUP+IDM_FILE,          "ファイルの操作に関するコマンド"
     MH_POPUP+IDM_DISK,          "ディスクの操作に関するコマンド"
@@ -542,15 +540,15 @@ END
 
 // Help strings for the "standard" toolbar items.
 
-STRINGTABLE LOADONCALL MOVEABLE DISCARDABLE
+STRINGTABLE
 BEGIN
     MH_MYITEMS+IDM_OPEN,        "選択アイテムを開く"
     MH_MYITEMS+IDM_EDIT,        "選択アイテムをメモ帳で編集する"
     MH_MYITEMS+IDM_MOVE,        "選択アイテムを移動する"
     MH_MYITEMS+IDM_COPY,        "ファイルまたはディレクトリをコピーする"
     MH_MYITEMS+IDM_COPYTOCLIPBOARD, "1つまたは複数のファイルをクリップボードにコピーする"
-	MH_MYITEMS+IDM_CUTTOCLIPBOARD, "1つまたは複数のファイルをクリップボードに切り取る"
-    MH_MYITEMS+IDM_PASTE,		"現在のディレクトリにクリップボードから貼り付ける"
+    MH_MYITEMS+IDM_CUTTOCLIPBOARD, "1つまたは複数のファイルをクリップボードに切り取る"
+    MH_MYITEMS+IDM_PASTE,       "現在のディレクトリにクリップボードから貼り付ける"
     MH_MYITEMS+IDM_COMPRESS,    "ファイルまたはディレクトリを圧縮する"
     MH_MYITEMS+IDM_UNCOMPRESS,  "ファイルまたはディレクトリを解凍する"
     MH_MYITEMS+IDM_DELETE,      "ファイルまたはディレクトリを削除する"
@@ -631,7 +629,7 @@ END
 
 // Strings for menu items that may be added at init time.
 
-STRINGTABLE MOVEABLE DISCARDABLE
+STRINGTABLE
 BEGIN
     IDS_CONNECT,                "ネットワーク ドライブの接続(&N)..."
     IDS_DISCONNECT,             "ネットワーク ドライブの切断(&C)..."

@@ -17,6 +17,7 @@
 
 #include <ole2.h>
 #include <shlobj.h>
+#include "resize.h"
 
 #include "dbg.h"
 
@@ -32,7 +33,7 @@ TCHAR szHelv[] = TEXT("MS Shell Dlg");
 HBITMAP hbmSave;
 
 DWORD   RGBToBGR(DWORD rgb);
-VOID    BoilThatDustSpec(register WCHAR *pStart, BOOL bLoadIt);
+VOID    BoilThatDustSpec(WCHAR *pStart, BOOL bLoadIt);
 VOID    DoRunEquals(PINT pnCmdShow);
 VOID    GetSavedWindow(LPWSTR szBuf, PWINDOW pwin);
 VOID    GetSettings(VOID);
@@ -250,7 +251,7 @@ GetSettings()
 
    GetPrivateProfileString(szSettings,
                            szFace,
-			   szHelv,
+                           szHelv,
                            szTemp,
                            COUNTOF(szTemp),
                            szTheINIFile);
@@ -292,7 +293,7 @@ GetInternational()
 
 
 INT
-GetDriveOffset(register DRIVE drive)
+GetDriveOffset(DRIVE drive)
 {
    if (IsRemoteDrive(drive)) {
 
@@ -511,9 +512,9 @@ UINT  MapMenuPosToIDM(UINT pos)
  */
 
 VOID
-BoilThatDustSpec(register TCHAR *pStart, BOOL bLoadIt)
+BoilThatDustSpec(TCHAR *pStart, BOOL bLoadIt)
 {
-   register TCHAR *pEnd;
+   TCHAR *       pEnd;
    DWORD         ret;
    BOOL          bFinished;
 
@@ -990,6 +991,16 @@ InitFileManager(
 
    InitializeCriticalSection(&CriticalSectionPath);
 
+   hKernel32 = GetModuleHandle(KERNEL32_DLL);
+   if (hKernel32)
+   {
+      lpfnCreateSymbolicLinkW = (PVOID)GetProcAddress(hKernel32, KERNEL32_CreateSymbolicLinkW);
+      lpfnGetLocaleInfoEx = (PVOID)GetProcAddress(hKernel32, KERNEL32_GetLocaleInfoEx);
+      lpfnLocaleNameToLCID = (PVOID)GetProcAddress(hKernel32, KERNEL32_LocaleNameToLCID);
+      lpfnWow64DisableWow64FsRedirection = (PVOID)GetProcAddress(hKernel32, KERNEL32_Wow64DisableWow64FsRedirection);
+      lpfnWow64RevertWow64FsRedirection = (PVOID)GetProcAddress(hKernel32, KERNEL32_Wow64RevertWow64FsRedirection);
+   }
+
    // ProfStart();
 
    //
@@ -1004,20 +1015,20 @@ InitFileManager(
    lstrcpy(szTheINIFile, szBaseINIFile);
    dwRetval = GetEnvironmentVariable(TEXT("APPDATA"), szBuffer, MAXPATHLEN);
    if (dwRetval > 0 && dwRetval <= (DWORD)(MAXPATHLEN - lstrlen(szRoamINIPath) - 1 - lstrlen(szBaseINIFile) - 1)) {
-	   wsprintf(szTheINIFile, TEXT("%s%s"), szBuffer, szRoamINIPath);
-	   if (CreateDirectory(szTheINIFile, NULL) || GetLastError() == ERROR_ALREADY_EXISTS) {
-		   wsprintf(szTheINIFile, TEXT("%s%s\\%s"), szBuffer, szRoamINIPath, szBaseINIFile);
-	   }
-	   else {
-		   wsprintf(szTheINIFile, TEXT("%s\\%s"), szBuffer, szBaseINIFile);
-	   }
+      wsprintf(szTheINIFile, TEXT("%s%s"), szBuffer, szRoamINIPath);
+      if (CreateDirectory(szTheINIFile, NULL) || GetLastError() == ERROR_ALREADY_EXISTS) {
+         wsprintf(szTheINIFile, TEXT("%s%s\\%s"), szBuffer, szRoamINIPath, szBaseINIFile);
+      }
+      else {
+         wsprintf(szTheINIFile, TEXT("%s\\%s"), szBuffer, szBaseINIFile);
+      }
    }
 
    // e.g., UILanguage=zh-CN; UI language defaults to OS set language or English if that language is not supported.
    GetPrivateProfileString(szSettings, szUILanguage, szNULL, szTemp, COUNTOF(szTemp), szTheINIFile);
    if (szTemp[0])
    {
-       LCID lcidUI = LocaleNameToLCID(szTemp, 0);
+       LCID lcidUI = WFLocaleNameToLCID(szTemp, 0);
        if (lcidUI != 0)
        {
            SetThreadUILanguage((LANGID)lcidUI);
@@ -1054,9 +1065,9 @@ JAPANEND
       I_Space(i);
    }
 
-	if (OleInitialize(0) != NOERROR)
-		return FALSE;
-	
+   if (OleInitialize(0) != NOERROR)
+      return FALSE;
+
    //
    // Remember the current directory.
    //
@@ -1273,6 +1284,10 @@ JAPANEND
    }
 #endif
 
+   if (!ResizeDialogInitialize(hInstance)) {
+      return FALSE;
+   }
+
    if (!LoadString(hInstance, IDS_WINFILE, szTitle, COUNTOF(szTitle))) {
       return FALSE;
    }
@@ -1313,7 +1328,7 @@ JAPANEND
    win.rc.right -= win.rc.left;
    win.rc.bottom -= win.rc.top;
 
-   // We need to know about all reaprse tags
+   // We need to know about all reparse tags
    hNtdll = GetModuleHandle(NTDLL_DLL);
    if (hNtdll)
    {
@@ -1338,10 +1353,10 @@ JAPANEND
       osversion.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 #pragma warning ( push )
 #pragma warning( disable : 4996 )
-	  GetVersionEx(&osversion);
+      GetVersionEx(&osversion);
 #pragma warning ( pop )
-	  if (osversion.dwMajorVersion >= 10 && osversion.dwBuildNumber >= 14972)
-        bDeveloperModeAvailable = TRUE;
+      if (osversion.dwMajorVersion >= 10 && osversion.dwBuildNumber >= 14972)
+         bDeveloperModeAvailable = TRUE;
 
       if (hwndPrev != NULL) {
          //  For Win32, this will accomplish almost the same effect as the
@@ -1634,7 +1649,7 @@ FreeFileManager()
    if (hVersion)
       FreeLibrary(hVersion);
 
-	OleUninitialize();
+   OleUninitialize();
 
 #undef CLOSEHANDLE
 }

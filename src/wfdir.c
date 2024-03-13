@@ -32,9 +32,9 @@ typedef struct _SELINFO {
 
 VOID RightTabbedTextOut(HDC hdc, INT x, INT y, LPWSTR pLine, WORD *pTabStops, INT x_offset, DWORD dwAlternateFileNameExtent);
 LRESULT ChangeDisplay(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-INT CompareDTA(register LPXDTA lpItem1, register LPXDTA lpItem2, DWORD dwSort);
+INT CompareDTA(LPXDTA lpItem1, LPXDTA lpItem2, DWORD dwSort);
 BOOL SetDirFocus(HWND hwndDir);
-VOID DirGetAnchorFocus(register HWND hwndLB, LPXDTALINK lpStart, PSELINFO pSelInfo);
+VOID DirGetAnchorFocus(HWND hwndLB, LPXDTALINK lpStart, PSELINFO pSelInfo);
 BOOL SetSelection(HWND hwndLB, LPXDTALINK lpStart, LPWSTR pszSel);
 INT DirFindIndex(HWND hwndLB, LPXDTALINK lpStart, LPTSTR lpszFile);
 VOID SortDirList(HWND hwndDir, LPXDTALINK lpStart, DWORD count, LPXDTA* lplpxdta);
@@ -311,9 +311,9 @@ FocusOnly:
 /////////////////////////////////////////////////////////////////////
 
 VOID
-CreateLBLine(register DWORD dwLineFormat, LPXDTA lpxdta, LPWSTR szBuffer)
+CreateLBLine(DWORD dwLineFormat, LPXDTA lpxdta, LPWSTR szBuffer)
 {
-   register LPWSTR pch;
+   LPWSTR pch;
    DWORD dwAttr;
 
    pch = szBuffer;
@@ -370,7 +370,15 @@ CreateLBLine(register DWORD dwLineFormat, LPXDTA lpxdta, LPWSTR szBuffer)
       }
       else 
       {
-         pch += PutSize(&lpxdta->qFileSize, pch);
+         if (dwAttr & ATTR_SYMBOLIC) 
+         {
+            lstrcpy(pch, TEXT("<SYMLINK>"));
+            pch += lstrlen(pch);
+         } 
+         else 
+         {
+            pch += PutSize(&lpxdta->qFileSize, pch);
+         }
       }
    }
 
@@ -875,8 +883,8 @@ DirWndProc(
       break;
 
    case WM_CONTEXTMENU:
-	   ActivateCommonContextMenu(hwnd, hwndLB, lParam);
-	   break;
+      ActivateCommonContextMenu(hwnd, hwndLB, lParam);
+         break;
 
    case WM_VKEYTOITEM:
       switch (GET_WM_VKEYTOITEM_CODE(wParam, lParam)) {
@@ -885,10 +893,10 @@ DirWndProc(
          TypeAheadString('\0', NULL);
          return -2L;
 
-	  case 'A':			/* Ctrl-A */
-		  if (GetKeyState(VK_CONTROL) >= 0)
-			  break;
-	  case 0xBF:        /* Ctrl-/ */
+      case 'A':         /* Ctrl-A */
+         if (GetKeyState(VK_CONTROL) >= 0)
+            break;
+      case 0xBF:        /* Ctrl-/ */
          TypeAheadString('\0', NULL);
          SendMessage(hwndFrame, WM_COMMAND, GET_WM_COMMAND_MPS(IDM_SELALL, 0, 0));
          return -2;
@@ -966,7 +974,7 @@ DirWndProc(
 // for WM_CREATE, wParam and lParam are ignored
 // for WM_FSC, wParam is FSC_* and lParam depends on the function (but the cases handled here are limited)
 // for FS_CHANGEDISPLAY, wParam is one of CD_* values; 
-//	for CD_SORT, LOWORD(lParam) == sort value
+//  for CD_SORT, LOWORD(lParam) == sort value
 //  for CD_VIEW, LOWORD(lParam) == view bits and HIWORD(lParam) == TRUE means always refresh
 //  for CD_PATH and CD_PATH_FORCE, lParam is the new path; if NULL, use MDI window text
 
@@ -1164,7 +1172,7 @@ ChangeDisplay(
          dwNewAttribs = (DWORD)GetWindowLongPtr(hwndListParms, GWL_ATTRIBS);
          SetWindowLongPtr(hwndListParms, GWL_VIEW, dwNewView);
 
-         bCreateDTABlock = FALSE;	// and szPath is NOT set
+         bCreateDTABlock = FALSE;   // and szPath is NOT set
 
          goto CreateLB;
       }
@@ -1299,7 +1307,7 @@ ChangeDisplay(
          SetWindowLongPtr(hwnd, GWLP_USERDATA, 1);
          SendMessage(hwndLB, LB_RESETCONTENT, 0, 0L);
 
-		 // bCreateDTABlock is TRUE and szPath is set
+         // bCreateDTABlock is TRUE and szPath is set
 
          goto CreateNewPath;
       }
@@ -1348,7 +1356,7 @@ ChangeDisplay(
       //
       GetMDIWindowText(hwndListParms, szPath, COUNTOF(szPath));
 
-	  // bCreateDTABlock == TRUE and szPath just set
+      // bCreateDTABlock == TRUE and szPath just set
 
 CreateLB:
 
@@ -1416,7 +1424,7 @@ CreateLB:
 
   CreateNewPath:
 
-	  if (bCreateDTABlock) {
+      if (bCreateDTABlock) {
 
          //
          // at this point szPath has the directory to read.  this
@@ -1424,11 +1432,11 @@ CreateLB:
          // FS_CHANGEDISPLAY (CD_PATH) directory reset
          //
 
-		 CharUpperBuff(szPath, 1);     // make sure
+         CharUpperBuff(szPath, 1);     // make sure
 
-		 SetWindowLongPtr(hwndListParms, GWL_TYPE, szPath[0] - TEXT('A'));
+         SetWindowLongPtr(hwndListParms, GWL_TYPE, szPath[0] - TEXT('A'));
 
-		 SetMDIWindowText(hwndListParms, szPath);
+         SetMDIWindowText(hwndListParms, szPath);
 
          lpStart = CreateDTABlock(hwnd,
                                   szPath,
@@ -1719,7 +1727,7 @@ GetPict(
    WCHAR ch,
    LPCWSTR pszStr)
 {
-   register UINT  count;
+   UINT  count;
 
    count = 0;
    while (ch == *pszStr++)
@@ -1966,8 +1974,8 @@ PutTime(
 
 INT
 PutAttributes(
-   register DWORD dwAttribute,
-   register LPWSTR pszStr)
+   DWORD dwAttribute,
+   LPWSTR pszStr)
 {
    INT   cch = 0;
 
@@ -2432,7 +2440,7 @@ FillDirList(
    HWND hwndDir,
    LPXDTALINK lpStart)
 {
-   register DWORD count;
+   DWORD count;
    UINT   i;
    LPXDTAHEAD lpHead;
    INT iError;
@@ -2507,11 +2515,11 @@ Error:
 
 INT
 CompareDTA(
-   register LPXDTA lpItem1,
-   register LPXDTA lpItem2,
+   LPXDTA lpItem1,
+   LPXDTA lpItem2,
    DWORD dwSort)
 {
-   register INT  ret;
+   INT  ret;
 
    if (!lpItem1 || !lpItem2)
       return lpItem1 ? 1 : -1;
@@ -2981,7 +2989,7 @@ GDSDone:
 INT
 DirFindIndex(HWND hwndLB, LPXDTALINK lpStart, LPWSTR lpszFile)
 {
-   register INT i;
+   INT i;
    DWORD dwSel;
    LPXDTA lpxdta;
 
@@ -3017,11 +3025,11 @@ DirFindIndex(HWND hwndLB, LPXDTALINK lpStart, LPWSTR lpszFile)
 
 VOID
 DirGetAnchorFocus(
-   register HWND hwndLB,
+   HWND hwndLB,
    LPXDTALINK lpStart,
    PSELINFO pSelInfo)
 {
-   register INT iSel, iCount;
+   INT iSel, iCount;
    LPXDTA   lpxdta;
 
    iSel = (INT)SendMessage(hwndLB, LB_GETANCHORINDEX, 0, 0L);
